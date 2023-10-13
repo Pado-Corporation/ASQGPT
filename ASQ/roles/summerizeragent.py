@@ -1,0 +1,2 @@
+class SummerizerAgent:
+    pass
