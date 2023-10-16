@@ -1,6 +1,8 @@
 import asyncio
 import fire
-from ASQ import ConsultingAgency  # Import the ConsultingAgency class from your module
+from ASQ.consultingagnecy import (
+    ConsultingAgency,
+)  # Import the ConsultingAgency class from your module
 
 
 async def run_consulting_agency(

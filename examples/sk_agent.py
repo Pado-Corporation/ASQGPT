@@ -21,23 +21,23 @@ from metagpt.tools.search_engine import SkSearchEngine
 
 
 async def main():
-    # await basic_planner_example()
+    await basic_planner_example()
     # await action_planner_example()
 
     # await sequential_planner_example()
-    await basic_planner_web_search_example()
+    # await basic_planner_web_search_example()
 
 
 async def basic_planner_example():
     task = """
-    Tomorrow is Valentine's day. I need to come up with a few date ideas. She speaks French so write it in French.
-    Convert the text to uppercase"""
+    부산에 대한 관광 정보를 특히 탐색하고, 부산의 주요 관광지를 추천한다. 이 때 추천해야하는 대상은 부산의 해산물을 좋아하는 사람이며, 부산의 밤문화에 대해서도 관심이 많다. """
     role = SkAgent()
 
     # let's give the agent some skills
     role.import_semantic_skill_from_directory(SKILL_DIRECTORY, "SummarizeSkill")
     role.import_semantic_skill_from_directory(SKILL_DIRECTORY, "WriterSkill")
     role.import_skill(TextSkill(), "TextSkill")
+    role.import_skill(SkSearchEngine(), "WebSearchSkill")
     # using BasicPlanner
     await role.run(Message(content=task, cause_by=BossRequirement))
 

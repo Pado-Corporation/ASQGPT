@@ -1,0 +1,38 @@
+Input : create a report on trip report about paris, I want to travel there from august 28th to 30, and 28 is my birthday. I love driking and go to club. I want to know how much it will cost totally.
+
+# Table of Contents
+1. Report Overview
+    1-1. Purpose and Scope
+    1-2. Data and information sources used
+    1-3. How to Organize the Report
+
+2. Trip Itinerary
+    2-1. Day 1: Birthday Celebration
+    2-2. Day 2: Exploring Paris
+    2-3. Day 3: Clubbing and Nightlife
+
+3. Cost Analysis
+    3-1. Travel Expenses
+    3-2. Accommodation Expenses
+    3-3. Food and Drink Expenses
+    3-4. Clubbing and Entertainment Expenses
+    3-5. Miscellaneous Expenses
+
+4. Recommendations
+    4-1. Best Time to Visit
+    4-2. Places to Visit
+    4-3. Tips and Tricks for a Budget-Friendly Trip
+
+# ActionItems
+1. Search the internet for the best flight deals from your location to Paris around the travel dates.
+2. Look for affordable accommodation options in Paris for the given dates.
+3. Research popular restaurants and clubs in Paris and their average costs.
+4. Search for public transportation options in Paris and their costs.
+5. Look for special birthday deals or discounts in Paris.
+6. Research the average cost of meals and drinks in Paris.
+7. Search for reviews and ratings of clubs in Paris.
+8. Look for any travel advisories or restrictions due to COVID-19 or other factors.
+9. Research the weather in Paris during the travel dates.
+10. Search for popular tourist attractions in Paris and their entry fees.
+11. Look for any cultural events or festivals happening in Paris during the travel dates.
+12. Research tips and tricks for a budget-friendly trip to Paris.

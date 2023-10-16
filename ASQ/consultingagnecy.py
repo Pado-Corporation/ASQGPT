@@ -1,5 +1,5 @@
 import asyncio
-from roles import (
+from ASQ.roles import (
     BossAgent,
     ProjectOwnerAgent,
     QueueManagerAgent,
