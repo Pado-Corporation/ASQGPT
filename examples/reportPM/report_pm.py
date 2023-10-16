@@ -78,16 +78,19 @@ class CreateTableOfContentsnActionItems(Action):
 
         rsp = await self._aask(prompt)
 
-        table_of_contents = CreateTableOfContentsnActionItems.parse_code(rsp)
+        table_of_contents, actionitems = CreateTableOfContentsnActionItems.parse_code(rsp)
 
-        return table_of_contents
+        return table_of_contents, actionitems
 
     @staticmethod
     def parse_code(rsp):
         pattern = r"```python(.*)```"
         match = re.search(pattern, rsp, re.DOTALL)
-        table_of_contents = match.group(1) if match else rsp
-        return table_of_contents
+        content = match.group(1) if match else rsp
+        table_of_contents, actionItems = content.split("# ActionItems")
+        return table_of_contents, actionItems
+
+    
 
 
 class SimpleReporter(Role):
