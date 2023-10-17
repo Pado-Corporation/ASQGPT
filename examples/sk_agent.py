@@ -29,10 +29,8 @@ async def main():
 
 
 async def basic_planner_example():
-    task = """
-    부산에 대한 관광 정보를 특히 탐색하고, 부산의 주요 관광지를 추천한다. 이 때 추천해야하는 대상은 부산의 해산물을 좋아하는 사람이며, 부산의 밤문화에 대해서도 관심이 많다. """
+    task = """Search the internet for data and reports on current market trends, consumer perceptions, competitive landscape, and more for gel type acne patch """
     role = SkAgent()
-
     # let's give the agent some skills
     role.import_semantic_skill_from_directory(SKILL_DIRECTORY, "SummarizeSkill")
     role.import_semantic_skill_from_directory(SKILL_DIRECTORY, "WriterSkill")

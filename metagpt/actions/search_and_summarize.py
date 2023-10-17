@@ -115,7 +115,9 @@ class SearchAndSummarize(Action):
 
     async def run(self, context: list[Message], system_text=SEARCH_AND_SUMMARIZE_SYSTEM) -> str:
         if self.search_engine is None:
-            logger.warning("Configure one of SERPAPI_API_KEY, SERPER_API_KEY, GOOGLE_API_KEY to unlock full feature")
+            logger.warning(
+                "Configure one of SERPAPI_API_KEY, SERPER_API_KEY, GOOGLE_API_KEY to unlock full feature"
+            )
             return ""
 
         query = context[-1].content
@@ -126,7 +128,7 @@ class SearchAndSummarize(Action):
             logger.error("empty rsp...")
             return ""
         # logger.info(rsp)
-
+        logger.info(rsp)
         system_prompt = [system_text]
 
         prompt = SEARCH_AND_SUMMARIZE_PROMPT.format(
@@ -136,8 +138,9 @@ class SearchAndSummarize(Action):
             QUERY_HISTORY="\n".join([str(i) for i in context[:-1]]),
             QUERY=str(context[-1]),
         )
+
+        logger.debug(prompt)
         result = await self._aask(prompt, system_prompt)
         logger.debug(prompt)
         logger.debug(result)
         return result
-    

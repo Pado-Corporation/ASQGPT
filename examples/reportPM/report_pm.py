@@ -88,6 +88,7 @@ class CreateTableOfContentsnActionItems(Action):
         match = re.search(pattern, rsp, re.DOTALL)
         content = match.group(1) if match else rsp
         table_of_contents, actionItems = content.split("# ActionItems")
+        
         return table_of_contents, actionItems
 
     

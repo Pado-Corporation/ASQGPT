@@ -163,7 +163,7 @@ class Role:
         logger.debug(f"{prompt=}")
         if not next_state.isdigit() or int(next_state) not in range(len(self._states)):
             logger.warning(f"Invalid answer of state, {next_state=}")
-            next_state = "0"
+            next_state = "0"  # 실패하면 다시 처음으로 돌아가서 재시작
         self._set_state(int(next_state))
 
     async def _act(self) -> Message:

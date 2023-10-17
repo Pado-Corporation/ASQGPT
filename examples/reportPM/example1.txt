@@ -24,7 +24,7 @@ Input : create a report on trip report about paris, I want to travel there from 
     4-3. Tips and Tricks for a Budget-Friendly Trip
 
 # ActionItems
-1. Search the internet for the best flight deals from your location to Paris around the travel dates.
+1. Search the internet for the best flight deals from korea to Paris around the travel dates august 27th.
 2. Look for affordable accommodation options in Paris for the given dates.
 3. Research popular restaurants and clubs in Paris and their average costs.
 4. Search for public transportation options in Paris and their costs.
