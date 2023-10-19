@@ -1,0 +1,5 @@
+2023-10-19 22:38:11.139 | INFO     | metagpt.config:__init__:44 - Config loading done.
+2023-10-19 22:38:13.145 | DEVELOP  | metagpt.actions.research:__init__:112 - research llm model is gpt-3.5-turbo-16k
+2023-10-19 22:38:13.148 | WARNING  | metagpt.roles.researcher:__init__:36 - The language `eng` has not been tested, it may not work.
+2023-10-19 22:38:13.148 | DEBUG    | metagpt.roles.role:_set_state:134 - [CollectLinks, WebBrowseAndSummarize, ConductResearch]
+2023-10-19 22:38:13.148 | INFO     | metagpt.roles.researcher:_act:51 - David(Researcher): ready to CollectLinks

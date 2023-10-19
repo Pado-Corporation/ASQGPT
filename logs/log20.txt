@@ -1,0 +1,149 @@
+2023-10-19 21:14:33.526 | INFO     | metagpt.config:__init__:44 - Config loading done.
+2023-10-19 21:14:35.528 | DEVELOP  | metagpt.actions.research:__init__:110 - research llm model is gpt-3.5-turbo-16k
+2023-10-19 21:14:35.530 | WARNING  | metagpt.roles.researcher:__init__:36 - The language `eng` has not been tested, it may not work.
+2023-10-19 21:14:35.530 | DEBUG    | metagpt.roles.role:_set_state:134 - [CollectLinks, WebBrowseAndSummarize, ConductResearch]
+2023-10-19 21:14:35.530 | INFO     | metagpt.roles.researcher:_act:51 - David(Researcher): ready to CollectLinks
+2023-10-19 21:14:48.193 | INFO     | metagpt.provider.openai_api:update_cost:89 - Total running cost: $0.001 | Max budget: $10.000 | Current cost: $0.001, prompt_tokens: 153, completion_tokens: 66
+2023-10-19 21:14:48.194 | DEBUG    | metagpt.provider.base_gpt_api:aask:45 - [{'role': 'system', 'content': 'You are an AI researcher assistant, and your research topic is:\nGather reactions and feedback about gel type acne patch on social media, forums, and review sites.\n'}, {'role': 'system', 'content': 'You are a Researcher, named David, your goal is Gather information and conduct research, and the constraint is Ensure accuracy and relevance of information. '}, {'role': 'user', 'content': 'Please provide just upto {keyword_num} important keyword related to your research topic for Google search. You should imagine like human and make a keyword like human. find most nice keyword that is most efficient to find ideal result.\nYour response must be in JSON format, for example: ["keyword1",...].\n### Requirements : Remember you should give upto {keyword_num} keyword\n'}]
+2023-10-19 21:14:48.194 | DEVELOP  | metagpt.actions.research:run:133 - None
+2023-10-19 21:14:48.194 | ERROR    | metagpt.actions.research:run:138 - fail to get keywords related to the research topic "Gather reactions and feedback about gel type acne patch on social media, forums, and review sites." for 'NoneType' object has no attribute 'find'
+Traceback (most recent call last):
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/examples/research.py", line 16, in <module>
+    asyncio.run(main())
+    │       │   └ <function main at 0x7f85281eb520>
+    │       └ <function run at 0x7f85281ebc70>
+    └ <module 'asyncio' from '/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/__init__.py'>
+
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+           │    │                  └ <coroutine object main at 0x7f8509086420>
+           │    └ <function BaseEventLoop.run_until_complete at 0x7f85285023b0>
+           └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/base_events.py", line 636, in run_until_complete
+    self.run_forever()
+    │    └ <function BaseEventLoop.run_forever at 0x7f8528502320>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/base_events.py", line 603, in run_forever
+    self._run_once()
+    │    └ <function BaseEventLoop._run_once at 0x7f8528503e20>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/base_events.py", line 1909, in _run_once
+    handle._run()
+    │      └ <function Handle._run at 0x7f852844b490>
+    └ <Handle <TaskStepMethWrapper object at 0x7f85090af400>()>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/events.py", line 80, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ <member '_args' of 'Handle' objects>
+    │    │            │    │           └ <Handle <TaskStepMethWrapper object at 0x7f85090af400>()>
+    │    │            │    └ <member '_callback' of 'Handle' objects>
+    │    │            └ <Handle <TaskStepMethWrapper object at 0x7f85090af400>()>
+    │    └ <member '_context' of 'Handle' objects>
+    └ <Handle <TaskStepMethWrapper object at 0x7f85090af400>()>
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/examples/research.py", line 11, in main
+    await role.run(topic)
+          │    │   └ 'Gather reactions and feedback about gel type acne patch on social media, forums, and review sites.'
+          │    └ <function Role.run at 0x7f85090bbc70>
+          └ <metagpt.roles.researcher.Researcher object at 0x7f85090ae5c0>
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/metagpt/roles/role.py", line 253, in run
+    rsp = await self._react()
+                │    └ <function Researcher._react at 0x7f85090d1a20>
+                └ <metagpt.roles.researcher.Researcher object at 0x7f85090ae5c0>
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/metagpt/roles/researcher.py", line 99, in _react
+    msg = await self._act()
+                │    └ <function Researcher._act at 0x7f85090d1990>
+                └ <metagpt.roles.researcher.Researcher object at 0x7f85090ae5c0>
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/metagpt/roles/researcher.py", line 62, in _act
+    links = await todo.run(topic, 5, 5)
+                  │    │   └ 'Gather reactions and feedback about gel type acne patch on social media, forums, and review sites.'
+                  │    └ <function CollectLinks.run at 0x7f8529853400>
+                  └ CollectLinks
+
+> File "/Users/parkgyutae/dev/Pado/ASQGPT/metagpt/actions/research.py", line 135, in run
+    queries = OutputParser.extract_struct(queries, list)
+              │            │              └ None
+              │            └ <classmethod(<function OutputParser.extract_struct at 0x7f8529453910>)>
+              └ <class 'metagpt.utils.common.OutputParser'>
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/metagpt/utils/common.py", line 178, in extract_struct
+    start_index = text.find("[" if data_type is list else "{")
+                  │                └ <class 'list'>
+                  └ None
+
+AttributeError: 'NoneType' object has no attribute 'find'
+2023-10-19 21:14:49.650 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:169 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+Gather reactions and feedback about gel type acne patch on social media, forums, and review sites.
+
+### The online search results
+0: {'title': 'Spot patch review and overall verdict | Pimple / acne patches - herbeautyaffair', 'link': 'https://herbeautyaffair.wordpress.com/2020/07/03/spot-patch-review-and-overall-verdict-pimple-acne-patches/', 'snippet': 'These spot patch can be an instant fix for healing acne like white ... Thank you:) Hope you like it and to catch more reviews press FOLLOW ...'}
+1: {'title': 'I Reviewed The Cosrx Acne Pimple Master Patch And Saw Visible Overnight Results', 'link': 'https://www.byrdie.com/cosrx-acne-pimple-master-patch-review-5116160', 'snippet': 'The Cosrx Acne Pimple Master Patches are worth the investment. I enjoyed using these, and they offered up visible overnight results.'}
+2: {'title': 'Pimple Patches and What They Offer - American Chemical Society', 'link': 'https://www.acs.org/education/resources/highschool/chemmatters/articles/pimple-patches-and-what-they-offer.html', 'snippet': 'Pimple patches are also convenient, replacing a thick lotion or gel over the pimples for a skin-colored patch and making the breakout less ...'}
+3: {'title': "Nexcare Acne Patches Suck All The Goo Out Of Your Zits And It's The Most Satisfying Thing I've Ever Seen - BuzzFeed", 'link': 'https://www.buzzfeed.com/katyherman/nexcare-pimple-patches-get-rid-of-acne', 'snippet': 'If nothing else, the blemish is usually a little less huge and swollen when a patch comes off. And let me say, I am slightly obsessed with them.'}
+4: {'title': 'Hydrocolloid Plasters – Other acne treatments – Acne.org Forum', 'link': 'https://www.acne.org/forums/71-other-acne-treatments/354366-hydrocolloid-plasters', 'snippet': 'Hydrocolloid patches are amazing! They work so, so well. It definitely heals it much better, less chance of a scar, but it they ONLY work on ...'}
+5: {'title': 'Acne Control Cleanser | Salicylic Acid Treatment - CeraVe', 'link': 'https://www.cerave.com/skincare/cleansers/acne-salicylic-acid-cleanser', 'snippet': "CeraVe's salicylic acid cleanser is an effective way to treat and prevent acne. This cleanser unclogs pores and removes oil without irritating the skin."}
+6: {'title': 'Nonprescription acne treatment: Which products work best? - Mayo Clinic', 'link': 'https://www.mayoclinic.org/diseases-conditions/acne/in-depth/acne-treatments/art-20045814', 'snippet': 'You can buy many acne medications at the store to treat mild to moderate acne and prevent breakouts. They include cleansing lotions, gels, foams ...'}
+7: {'title': 'Skincare Products for Acne-Prone Skin | CeraVe', 'link': 'https://www.cerave.com/skincare/acne', 'snippet': "Explore CeraVe's acne treatments and skincare products for acne-prone skin, including a salicylic acid acne gel, benzoyl peroxide face wash, and more."}
+8: {'title': 'Review: 3M Nexcare Skin Care Acne Patch - FIGIBANK  ', 'link': 'http://figibank.blogspot.com/2015/08/product-write-up-3m-nexcare-skin-care.html?m=1', 'snippet': 'They reported a statistically significant difference in acne severity, redness, oiliness and dark pigmentation with the Acne Dressing group, ...'}
+9: {'title': 'The Best Acne Patches of 2023 (Review) - Miami Herald', 'link': 'https://www.miamiherald.com/reviews/acne-patch/', 'snippet': '1 I DEW CARE Acne Patch – Best Overall · 2 Dots for Spots Acne Patch – Suitable for All Skin Types · 3 Rael Acne Patch – Vegan Choice · 4 Mighty ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 21:14:57.728 | INFO     | metagpt.provider.openai_api:update_cost:89 - Total running cost: $0.004 | Max budget: $10.000 | Current cost: $0.003, prompt_tokens: 1054, completion_tokens: 52
+2023-10-19 21:14:57.730 | DEBUG    | metagpt.provider.base_gpt_api:aask:45 - [{'role': 'system', 'content': 'You are a Researcher, named David, your goal is Gather information and conduct research, and the constraint is Ensure accuracy and relevance of information. '}, {'role': 'user', 'content': '\nYour role is ranking every url based on relevancy between query and result snippet\n### Query\nGather reactions and feedback about gel type acne patch on social media, forums, and review sites.\n\n### The online search results\n0: {\'title\': \'Spot patch review and overall verdict | Pimple / acne patches - herbeautyaffair\', \'link\': \'https://herbeautyaffair.wordpress.com/2020/07/03/spot-patch-review-and-overall-verdict-pimple-acne-patches/\', \'snippet\': \'These spot patch can be an instant fix for healing acne like white ... Thank you:) Hope you like it and to catch more reviews press FOLLOW ...\'}\n1: {\'title\': \'I Reviewed The Cosrx Acne Pimple Master Patch And Saw Visible Overnight Results\', \'link\': \'https://www.byrdie.com/cosrx-acne-pimple-master-patch-review-5116160\', \'snippet\': \'The Cosrx Acne Pimple Master Patches are worth the investment. I enjoyed using these, and they offered up visible overnight results.\'}\n2: {\'title\': \'Pimple Patches and What They Offer - American Chemical Society\', \'link\': \'https://www.acs.org/education/resources/highschool/chemmatters/articles/pimple-patches-and-what-they-offer.html\', \'snippet\': \'Pimple patches are also convenient, replacing a thick lotion or gel over the pimples for a skin-colored patch and making the breakout less ...\'}\n3: {\'title\': "Nexcare Acne Patches Suck All The Goo Out Of Your Zits And It\'s The Most Satisfying Thing I\'ve Ever Seen - BuzzFeed", \'link\': \'https://www.buzzfeed.com/katyherman/nexcare-pimple-patches-get-rid-of-acne\', \'snippet\': \'If nothing else, the blemish is usually a little less huge and swollen when a patch comes off. And let me say, I am slightly obsessed with them.\'}\n4: {\'title\': \'Hydrocolloid Plasters – Other acne treatments – Acne.org Forum\', \'link\': \'https://www.acne.org/forums/71-other-acne-treatments/354366-hydrocolloid-plasters\', \'snippet\': \'Hydrocolloid patches are amazing! They work so, so well. It definitely heals it much better, less chance of a scar, but it they ONLY work on ...\'}\n5: {\'title\': \'Acne Control Cleanser | Salicylic Acid Treatment - CeraVe\', \'link\': \'https://www.cerave.com/skincare/cleansers/acne-salicylic-acid-cleanser\', \'snippet\': "CeraVe\'s salicylic acid cleanser is an effective way to treat and prevent acne. This cleanser unclogs pores and removes oil without irritating the skin."}\n6: {\'title\': \'Nonprescription acne treatment: Which products work best? - Mayo Clinic\', \'link\': \'https://www.mayoclinic.org/diseases-conditions/acne/in-depth/acne-treatments/art-20045814\', \'snippet\': \'You can buy many acne medications at the store to treat mild to moderate acne and prevent breakouts. They include cleansing lotions, gels, foams ...\'}\n7: {\'title\': \'Skincare Products for Acne-Prone Skin | CeraVe\', \'link\': \'https://www.cerave.com/skincare/acne\', \'snippet\': "Explore CeraVe\'s acne treatments and skincare products for acne-prone skin, including a salicylic acid acne gel, benzoyl peroxide face wash, and more."}\n8: {\'title\': \'Review: 3M Nexcare Skin Care Acne Patch - FIGIBANK  \', \'link\': \'http://figibank.blogspot.com/2015/08/product-write-up-3m-nexcare-skin-care.html?m=1\', \'snippet\': \'They reported a statistically significant difference in acne severity, redness, oiliness and dark pigmentation with the Acne Dressing group, ...\'}\n9: {\'title\': \'The Best Acne Patches of 2023 (Review) - Miami Herald\', \'link\': \'https://www.miamiherald.com/reviews/acne-patch/\', \'snippet\': \'1 I DEW CARE Acne Patch – Best Overall · 2 Dots for Spots Acne Patch – Suitable for All Skin Types · 3 Rael Acne Patch – Vegan Choice · 4 Mighty ...\'}\n\n### Requirements\n- rank results\' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.\n- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]\n'}]
+2023-10-19 21:14:57.731 | ERROR    | metagpt.actions.research:_search_and_rank_urls:176 - fail to rank results for 'NoneType' object has no attribute 'find'
+Traceback (most recent call last):
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/examples/research.py", line 16, in <module>
+    asyncio.run(main())
+    │       │   └ <function main at 0x7f85281eb520>
+    │       └ <function run at 0x7f85281ebc70>
+    └ <module 'asyncio' from '/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/__init__.py'>
+
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+           │    │                  └ <coroutine object main at 0x7f8509086420>
+           │    └ <function BaseEventLoop.run_until_complete at 0x7f85285023b0>
+           └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/base_events.py", line 636, in run_until_complete
+    self.run_forever()
+    │    └ <function BaseEventLoop.run_forever at 0x7f8528502320>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/base_events.py", line 603, in run_forever
+    self._run_once()
+    │    └ <function BaseEventLoop._run_once at 0x7f8528503e20>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/base_events.py", line 1909, in _run_once
+    handle._run()
+    │      └ <function Handle._run at 0x7f852844b490>
+    └ <Handle <TaskStepMethWrapper object at 0x7f84c8739510>()>
+  File "/Users/parkgyutae/opt/anaconda3/envs/metagpt/lib/python3.10/asyncio/events.py", line 80, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ <member '_args' of 'Handle' objects>
+    │    │            │    │           └ <Handle <TaskStepMethWrapper object at 0x7f84c8739510>()>
+    │    │            │    └ <member '_callback' of 'Handle' objects>
+    │    │            └ <Handle <TaskStepMethWrapper object at 0x7f84c8739510>()>
+    │    └ <member '_context' of 'Handle' objects>
+    └ <Handle <TaskStepMethWrapper object at 0x7f84c8739510>()>
+
+> File "/Users/parkgyutae/dev/Pado/ASQGPT/metagpt/actions/research.py", line 173, in _search_and_rank_urls
+    indices = OutputParser.extract_struct(indices, list)
+              │            │              └ None
+              │            └ <classmethod(<function OutputParser.extract_struct at 0x7f8529453910>)>
+              └ <class 'metagpt.utils.common.OutputParser'>
+
+  File "/Users/parkgyutae/dev/Pado/ASQGPT/metagpt/utils/common.py", line 178, in extract_struct
+    start_index = text.find("[" if data_type is list else "{")
+                  │                └ <class 'list'>
+                  └ None
+
+AttributeError: 'NoneType' object has no attribute 'find'
+2023-10-19 21:14:57.737 | DEBUG    | metagpt.roles.role:_set_state:134 - [CollectLinks, WebBrowseAndSummarize, ConductResearch]
+2023-10-19 21:14:57.737 | INFO     | metagpt.roles.researcher:_act:51 - David(Researcher): ready to WebBrowseAndSummarize

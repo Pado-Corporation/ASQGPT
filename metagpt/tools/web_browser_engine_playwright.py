@@ -11,6 +11,7 @@ from playwright.async_api import async_playwright
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.parse_html import WebPage
+import random
 
 
 class PlaywrightWrapper:
@@ -48,25 +49,33 @@ class PlaywrightWrapper:
             browser_type = getattr(ap, self.browser_type)
             await self._run_precheck(browser_type)
             browser = await browser_type.launch(**self.launch_kwargs)
-            _scrape = self._scrape
+            context = await browser.new_context(**self._context_kwargs)
+            page = await context.new_page()
+            async with page:
+                _scrape = lambda url: self._scrape(page, url)
 
-            if urls:
-                return await asyncio.gather(_scrape(browser, url), *(_scrape(browser, i) for i in urls))
-            return await _scrape(browser, url)
+                if urls:
+                    return await asyncio.gather(_scrape(url), *(_scrape(i) for i in urls))
+                return await _scrape(url)
 
-    async def _scrape(self, browser, url):
-        context = await browser.new_context(**self._context_kwargs)
-        page = await context.new_page()
-        async with page:
-            try:
-                await page.goto(url)
-                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                html = await page.content()
-                inner_text = await page.evaluate("() => document.body.innerText")
-            except Exception as e:
+    async def _scrape(self, page, url, retry_count=0, max_retries=5):
+        try:
+            await page.goto(url)
+            await asyncio.sleep(0.3)
+            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            html = await page.content()
+            inner_text = await page.evaluate("() => document.body.innerText")
+            return WebPage(inner_text=inner_text, html=html, url=url)
+        except Exception as e:
+            if retry_count < max_retries:
+                logger.warning(f"Page load retry {url}")
+                await asyncio.sleep(random.uniform(0, 2))  # 1초 대기 후 재시도
+                return await self._scrape(page, url, retry_count=retry_count + 1)
+            else:
+                logger.error(f"Page load failed {url}")
                 inner_text = f"Fail to load page content for {e}"
                 html = ""
-            return WebPage(inner_text=inner_text, html=html, url=url)
+                return WebPage(inner_text=inner_text, html=html, url=url)
 
     async def _run_precheck(self, browser_type):
         if self._has_run_precheck:
@@ -119,7 +128,9 @@ async def _install_browsers(*browsers, **kwargs) -> None:
             **kwargs,
         )
 
-        await asyncio.gather(_log_stream(process.stdout, logger.info), _log_stream(process.stderr, logger.warning))
+        await asyncio.gather(
+            _log_stream(process.stdout, logger.info), _log_stream(process.stderr, logger.warning)
+        )
 
         if await process.wait() == 0:
             logger.info("Install browser for playwright successfully.")

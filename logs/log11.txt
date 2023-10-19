@@ -1,0 +1,192 @@
+2023-10-19 20:15:27.225 | INFO     | metagpt.config:__init__:44 - Config loading done.
+2023-10-19 20:15:29.225 | DEVELOP  | metagpt.actions.research:__init__:107 - research llm model is gpt-3.5-turbo-16k
+2023-10-19 20:15:29.227 | WARNING  | metagpt.roles.researcher:__init__:36 - The language `eng` has not been tested, it may not work.
+2023-10-19 20:15:29.227 | DEBUG    | metagpt.roles.role:_set_state:134 - [CollectLinks, WebBrowseAndSummarize, ConductResearch]
+2023-10-19 20:15:29.227 | INFO     | metagpt.roles.researcher:_act:51 - David(Researcher): ready to CollectLinks
+2023-10-19 20:15:38.267 | INFO     | metagpt.provider.openai_api:update_cost:89 - Total running cost: $0.001 | Max budget: $10.000 | Current cost: $0.001, prompt_tokens: 147, completion_tokens: 53
+2023-10-19 20:15:38.268 | DEBUG    | metagpt.provider.base_gpt_api:aask:45 - [{'role': 'system', 'content': 'You are an AI researcher assistant, and your research topic is:\nDo a report on industry and companies about creating an AI agents ecosystem.\n'}, {'role': 'system', 'content': 'You are a Researcher, named David, your goal is Gather information and conduct research, and the constraint is Ensure accuracy and relevance of information. '}, {'role': 'user', 'content': 'Please provide just upto {keyword_num} important keyword related to your research topic for Google search. You should imagine like human and make a keyword like human. find most nice keyword that is most efficient to find ideal result.\nYour response must be in JSON format, for example: ["keyword1",...].\n### Requirements : Remember you should give upto {keyword_num} keyword\n'}]
+2023-10-19 20:15:38.268 | DEVELOP  | metagpt.actions.research:run:130 - ["AI agents ecosystem", "industry trends AI agents", "companies creating AI agents", "AI agents market analysis", "AI agents platform", "AI agents development", "AI agents applications", "AI agents technology", "AI agents adoption", "AI agents challenges"]
+2023-10-19 20:15:39.290 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents market analysis
+
+### The online search results
+0: {'title': 'Autonomous AI and Autonomous Agents Market Share & Size, Global Trends, Statistics, Growth Forecast | MarketsandMarkets', 'link': 'https://www.marketsandmarkets.com/Market-Reports/autonomous-ai-and-autonomous-agents-market-208190735.html', 'snippet': '[375 Pages Report] The global Autonomous AI and Autonomous Agents Market size as per revenue was exceeded $4.8 billion in 2023 and is poised ...'}
+1: {'title': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the forecast period', 'link': 'https://www.globenewswire.com/news-release/2023/08/30/2734611/0/en/The-Global-Autonomous-AI-and-Autonomous-Agents-Market-size-is-expected-to-reach-51-2-billion-by-2030-rising-at-a-market-growth-of-40-7-CAGR-during-the-forecast-period.html', 'snippet': 'Under software type, the market is bifurcated into computational agents and robotic agents. In 2022, the computational agents segment witnessed ...'}
+2: {'title': 'Autonomous AI and Autonomous Agents Market worth $28.5 billion by 2028 - Exclusive Report by MarketsandMarkets™ - PR Newswire', 'link': 'https://www.prnewswire.com/news-releases/autonomous-ai-and-autonomous-agents-market-worth-28-5-billion-by-2028---exclusive-report-by-marketsandmarkets-301854064.html', 'snippet': 'The Autonomous AI and Autonomous Agents Market is estimated to grow from USD 4.8 billion in 2023 to USD 28.5 billion by 2028, at a CAGR of 43.0% ...'}
+3: {'title': 'Autonomous AI and Autonomous Agents Market Potential Growth and Trends - LinkedIn', 'link': 'https://www.linkedin.com/pulse/autonomous-ai-agents-market-potential-growth-trends-sayee-das', 'snippet': 'The market for Autonomous AI and Autonomous Agents is estimated to grow from USD 4.8 billion in 2023 to USD 28.5 billion by 2028, at a CAGR of ...'}
+4: {'title': 'Autonomous Agents Market Size, Industry Share, & Forecast 2030', 'link': 'https://www.fortunebusinessinsights.com/autonomous-agents-market-102223', 'snippet': 'Autonomous Agents Market report summarizes top key players overview as Oracle Corporation, International Business Machines (IBM) Corporation, SAP SE, ...'}
+5: {'title': 'Artificial Intelligence Market Size, Share, Growth Report 2030 - Grand View Research', 'link': 'https://www.grandviewresearch.com/industry-analysis/artificial-intelligence-ai-market', 'snippet': 'The global artificial intelligence market size was valued at USD 136.55 billion in 2022 and is projected to expand at a compound annual growth rate (CAGR) of ...'}
+6: {'title': 'Autonomous Agents Market Statistics & Growth | Forecast', 'link': 'https://www.alliedmarketresearch.com/autonomous-agents-market-A06812', 'snippet': 'The report provides detailed autonomous agents market analysis based on competitive intensity and how the competition will take shape in coming years.'}
+7: {'title': 'Autonomous AI and Autonomous Agents Market Size, Share & Industry Analysis 2032', 'link': 'https://www.marketresearchfuture.com/reports/autonomous-ai-autonomous-agents-market-12255', 'snippet': 'Autonomous AI and autonomous agents market industry is projected to grow from USD 6.03 Billion in 2023 to USD 110.42 Billion by 2032.'}
+8: {'title': 'Autonomous AI and Autonomous Agents Market Size, Share, 2030 - KBV Research', 'link': 'https://www.kbvresearch.com/autonomous-ai-and-autonomous-agents-market/', 'snippet': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the ...'}
+9: {'title': 'AI ChatGPT-Powered Market Analysis: Game-Changing Feature for Real Estate Marketing', 'link': 'https://blog.narrpr.com/tips/ai-powered-market-analysis/', 'snippet': 'Elevate your marketing efforts with this innovative new tool! RPR has integrated with ChatGPT to help REALTORS® craft personalized video scripts, ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.322 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents adoption
+
+### The online search results
+0: {'title': 'How our new AI feature earned 5% adoption in its first week | TechCrunch', 'link': 'https://techcrunch.com/2023/10/02/how-our-new-ai-feature-earned-5-adoption-in-its-first-week/', 'snippet': "We developed an 'AI as agent' approach and shipped a new AI capability that exploded to 5% adoption in the first week."}
+1: {'title': 'What Businesses Need To Consider For Generative AI Adoption - Forbes', 'link': 'https://www.forbes.com/sites/digital-assets/2023/08/29/what-businesses-need-to-consider-for-generative-ai-adoption/?sh=2bf59d16775b', 'snippet': 'Recently, there has been a notable trend in adopting Artificial Intelligence Generated Content (AIGC) across diverse industries.'}
+2: {'title': 'Adopting AI and empowering customer service agents - TechNative', 'link': 'https://technative.io/adopting-ai-and-empowering-customer-service-agents/', 'snippet': "Customer service agents need to understand that AI isn't something to be fearful of, but rather something they can embrace to feel empowered in ..."}
+3: {'title': 'The Challenges of Enterprise AI and LLM Adoption - The Human Factor - LinkedIn', 'link': 'https://www.linkedin.com/pulse/challenges-enterprise-ai-llm-adoption-human-factor-szabolcs-k%C3%B3sa', 'snippet': 'Entire processes could be halted until the AI agent is restored, impacting business continuity, productivity, and possibly even revenue streams.'}
+4: {'title': 'The Adoption of AI Into Agency Operations - media works', 'link': 'https://medialtd.com/uncategorized/the-adoption-of-ai-into-agency-operations/', 'snippet': "I recently attended a 4A's webinar explaining why agencies need to embrace AI that was hosted by Google, and it shed light on how this ..."}
+5: {'title': "This company adopted AI. Here's what happened to its human workers - NPR", 'link': 'https://www.npr.org/sections/money/2023/05/02/1172791281/this-company-adopted-ai-heres-what-happened-to-its-human-workers', 'snippet': "This company adopted AI. Here's what happened to its human workers. May 2 ... agents were given assistance from intelligent machines. The ..."}
+6: {'title': '[PDF] AI Adoption and System-Wide Change - Wharton Marketing', 'link': 'https://marketing.wharton.upenn.edu/wp-content/uploads/2022/04/04.07.2022-Goldfarb-Avi-PAPER.pdf', 'snippet': 'We now turn to consider how this equilibrium outcome changes whether the organisation should adopt AI so that agent 1 receives a signal or prediction of T1.'}
+7: {'title': 'Why real estate agents are adopting AI more quickly than brokers - HousingWire', 'link': 'https://www.housingwire.com/podcast/why-real-estate-agents-are-adopting-ai-more-quickly-than-brokers/', 'snippet': "Today's episode is about how brokers and agents are feeling about the housing market, AI adoption and their biggest challenges."}
+8: {'title': 'What are AI agents? - Cloud Adoption Framework - Microsoft Learn', 'link': 'https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/innovate/best-practices/conversational-ai', 'snippet': 'Examples of AI agents can be found in the code for things like chat bots, smart homes, and the programmatic trading software used in finance.'}
+9: {'title': 'Why successful adoption of AI will build on a foundation of trust | EY - US', 'link': 'https://www.ey.com/en_us/consulting/why-successful-adoption-of-ai-will-build-on-a-foundation-of-trust', 'snippet': 'Building AI solutions that inspire confidence requires a multifaceted approach across scientific disciplines, industries and government.'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.325 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents platform
+
+### The online search results
+0: {'title': '60 Best Ai agent AI tools - TopAI.tools', 'link': 'https://topai.tools/s/AI-Agent', 'snippet': 'AI Agent is a web app that allows users to create customized AI agents to perform specific tasks and achieve goals. The AI Agent works by breaking down ...'}
+1: {'title': 'Top AI Agents in 2023 - Slashdot', 'link': 'https://slashdot.org/software/ai-agents/', 'snippet': "An AI agent is a software application that automates tasks around the home, workplace, or any other environment. It's an automated system that uses artificial ..."}
+2: {'title': 'What is an AI agent? | Zapier', 'link': 'https://zapier.com/blog/ai-agent/', 'snippet': 'AI Agent is a flexible app that lets you create your own agents, by picking a name, an objective, and the AI model it should use (GPT-3.5 Turbo ...'}
+3: {'title': 'Best AI Agents - 2023 Reviews & Comparison - SourceForge', 'link': 'https://sourceforge.net/software/ai-agents/', 'snippet': 'An AI agent is a software or robot that simulates human behavior and decision-making processes to interact with its environment in order to accomplish goals. AI ...'}
+4: {'title': 'Beam - Generative AI Agents that Work for You', 'link': 'https://www.beam.ai/', 'snippet': "Beam's generative AI agents help teams multiply their productivity, automate time-consuming business processes and focus on the work that really matters."}
+5: {'title': 'First Ever AI Management Platform - Glia', 'link': 'https://www.glia.com/ai', 'snippet': "The world's first artificial intelligence management platform for orchestrating multiple conversational AI deployments and chatbots in one place."}
+6: {'title': 'Fixie.ai', 'link': 'https://www.fixie.ai/', 'snippet': "Fixie is the world's leading platform for building conversational AI Sidekicks that are designed to answer questions, take action, and live directly ..."}
+7: {'title': 'Voiceflow | Build amazing conversational assistants', 'link': 'https://www.voiceflow.com/', 'snippet': 'Voiceflow is the collaborative AI agent building platform for teams to design, develop, and launch chat and voice assistants.'}
+8: {'title': 'Clever.ai: the intelligent agent platform - Medium', 'link': 'https://medium.com/clever-platform/clever-ai-the-intelligent-agent-platform-4d95256cac66', 'snippet': 'The platform is based on the concept of intelligent agents, experts at getting things done at any domain, collaborating and communicating to solve problems.'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.383 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents technology
+
+### The online search results
+0: {'title': "How 'A.I. Agents' That Roam the Internet Could One Day Replace Workers", 'link': 'https://www.nytimes.com/2023/10/16/technology/ai-agents-workers-replace.html', 'snippet': 'Researchers are transforming chatbots into online agents that play games, query websites, schedule meetings, build bar charts and do more.'}
+1: {'title': 'What is an intelligent agent? | Definition from TechTarget', 'link': 'https://www.techtarget.com/searchenterpriseai/definition/agent-intelligent-agent', 'snippet': 'An intelligent agent is a program that can make decisions or perform a service based on its environment, user input and experiences.'}
+2: {'title': 'Agents in AI: Exploring Intelligent Agents and Its Types, Functions & Composition', 'link': 'https://www.simplilearn.com/what-is-intelligent-agent-in-ai-types-function-article', 'snippet': 'Intelligent Agents in AI are autonomous entities that perceive their environment and make decisions to achieve specific goals. 2. How do ...'}
+3: {'title': 'What is an AI agent? | Zapier', 'link': 'https://zapier.com/blog/ai-agent/', 'snippet': 'AI Agent is a flexible app that lets you create your own agents, by picking a name, an objective, and the AI model it should use (GPT-3.5 Turbo ...'}
+4: {'title': 'Intelligent agent - Wikipedia', 'link': 'https://en.wikipedia.org/wiki/Intelligent_agent', 'snippet': 'In artificial intelligence, an intelligent agent (IA) is an agent acting in an intelligent manner; It perceives its environment, takes actions autonomously ...'}
+5: {'title': 'How do you work with AI agents? - LinkedIn', 'link': 'https://www.linkedin.com/advice/0/how-do-you-work-ai-agents-skills-artificial-intelligence', 'snippet': 'AI agents are software programs that can perform tasks, interact with users, or learn from data. They can be useful for various applications ...'}
+6: {'title': 'What is an AI Agent? 5 Types of Intelligent Agents Explained - Enterprise DNA Blogs', 'link': 'https://blog.enterprisedna.co/what-is-an-ai-agent/', 'snippet': 'An AI agent is like a digital helper that can think and make decisions on its own. It uses information from its surroundings, learns from its experiences, and ...'}
+7: {'title': 'Agents in Artificial Intelligence - GeeksforGeeks', 'link': 'https://www.geeksforgeeks.org/agents-artificial-intelligence/', 'snippet': 'In artificial intelligence, an agent is a computer program or system that is designed to perceive its environment, make decisions and take ...'}
+8: {'title': '6 Types of AI Agents: Exploring the Future of Intelligent Machines - Simform', 'link': 'https://www.simform.com/blog/types-of-ai-agents/', 'snippet': 'An AI learning agent is a software agent that can learn from past experiences and improve its performance. It initially acts with basic ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.386 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents development
+
+### The online search results
+0: {'title': 'How do you work with AI agents? - LinkedIn', 'link': 'https://www.linkedin.com/advice/0/how-do-you-work-ai-agents-skills-artificial-intelligence', 'snippet': 'You can use various tools and libraries to develop an AI agent, such as TensorFlow, PyTorch, NLTK, OpenCV, or Dialogflow. Add your perspective.'}
+1: {'title': "Insight: Race towards 'autonomous' AI agents grips Silicon Valley | Reuters", 'link': 'https://www.reuters.com/technology/race-towards-autonomous-ai-agents-grips-silicon-valley-2023-07-17/', 'snippet': 'The race towards increasingly autonomous AI agents has been supercharged by the March release of GPT-4 by developer OpenAI, a powerful upgrade ...'}
+2: {'title': 'Specialized Freelance Services in AI Agents - Fiverr', 'link': 'https://www.fiverr.com/categories/programming-tech/ai-coding/ai-agents-development', 'snippet': 'Find top-notch freelance services for AI Agents. From virtual assistants to customer service bots, we provide customized AI solutions for you.'}
+3: {'title': 'Autonomous AI Agent. The next AI revolution after chatGPT | by agent007GPT - Medium', 'link': 'https://medium.com/@agent007gpt/autonomous-ai-agent-c947f7e58a94', 'snippet': 'Artificial Intelligence (AI) is experiencing rapid growth and development. One of the most significant advancements in AI is the rise of ...'}
+4: {'title': 'AI Agents: Adapting to the Future of Software Development - ReadWrite', 'link': 'https://readwrite.com/ai-agents-adapting-to-the-future-of-software-development/', 'snippet': 'Explore the future of AI in software dev. Learn how developers can adapt, the role of AI agents like Pixie, and how to leverage AI for human ...'}
+5: {'title': 'e2b-dev/awesome-ai-agents: A list of AI autonomous agents - GitHub', 'link': 'https://github.com/e2b-dev/awesome-ai-agents', 'snippet': 'A list of AI autonomous agents. Contribute to e2b-dev/awesome-ai-agents development by creating an account on GitHub.'}
+6: {'title': 'Autonomous AI Agents - We Are at a Dawn of a new Era. The Era of AI. - ITMAGINATION', 'link': 'https://www.itmagination.com/blog/autonomous-ai-agents-we-are-at-a-dawn-of-a-new-era-of-ai', 'snippet': 'By harnessing the power of these intelligent systems, companies can unlock new opportunities for growth and efficiency. Here, we discuss some of the key ...'}
+7: {'title': 'What is an AI agent? | Zapier', 'link': 'https://zapier.com/blog/ai-agent/', 'snippet': 'AI Agent is a flexible app that lets you create your own agents, by picking a name, an objective, and the AI model it should use (GPT-3.5 Turbo ...'}
+8: {'title': 'Agents in Artificial Intelligence - GeeksforGeeks', 'link': 'https://www.geeksforgeeks.org/agents-artificial-intelligence/', 'snippet': 'The agents which are developed having their end uses as building blocks are called utility-based agents. When there are multiple possible ...'}
+9: {'title': 'AI And Autonomous Agents: The Development In AI That Will Change The World Forever', 'link': 'https://youtube.com/watch?v=ZGIoKmxNK7Q', 'snippet': 'Soon, AI is going to be a billion times smarter than us ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.390 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+industry trends AI agents
+
+### The online search results
+0: {'title': 'Autonomous AI And Autonomous Agents Market Report 2030 - Grand View Research', 'link': 'https://www.grandviewresearch.com/industry-analysis/autonomous-ai-autonomous-agents-market-report', 'snippet': 'The global autonomous AI and autonomous agents market size was estimated at USD 3.93 billion in 2022 and is expected to grow at a CAGR of 42.8% from 2023 to ...'}
+1: {'title': 'Autonomous AI and Autonomous Agents Market Share & Size, Global Trends, Statistics, Growth Forecast | MarketsandMarkets', 'link': 'https://www.marketsandmarkets.com/Market-Reports/autonomous-ai-and-autonomous-agents-market-208190735.html', 'snippet': '[375 Pages Report] The global Autonomous AI and Autonomous Agents Market size as per revenue was exceeded $4.8 billion in 2023 and is poised ...'}
+2: {'title': 'Autonomous AI and Autonomous Agents Market Potential Growth and Trends - LinkedIn', 'link': 'https://www.linkedin.com/pulse/autonomous-ai-agents-market-potential-growth-trends-sayee-das', 'snippet': 'The market for Autonomous AI and Autonomous Agents is estimated to grow from USD 4.8 billion in 2023 to USD 28.5 billion by 2028, at a CAGR of ...'}
+3: {'title': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the forecast period', 'link': 'https://www.globenewswire.com/news-release/2023/08/30/2734611/0/en/The-Global-Autonomous-AI-and-Autonomous-Agents-Market-size-is-expected-to-reach-51-2-billion-by-2030-rising-at-a-market-growth-of-40-7-CAGR-during-the-forecast-period.html', 'snippet': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR ...'}
+4: {'title': 'Autonomous AI and Autonomous Agents Market Size, Share, 2030 - KBV Research', 'link': 'https://www.kbvresearch.com/autonomous-ai-and-autonomous-agents-market/', 'snippet': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the f.'}
+5: {'title': 'AI Agents and IoT Integration: Shaping Industries and Our Daily Lives - Inclusion Cloud', 'link': 'https://inclusioncloud.com/insights/blog/ai-agents-reshaping-business/', 'snippet': 'Explore how AI agents are transforming businesses by automating tasks and improving decision-making.'}
+6: {'title': 'How Autonomous AI Agents are Reshaping Industries and Redefining Expertise - Xyonix', 'link': 'https://www.xyonix.com/blog/how-autonomous-ai-agents-are-reshaping-industries-and-redefining-expertise', 'snippet': "With an analysis of past preferences or shopping trends, AI agents suggest products and tackle your calendar as if they've known you for ages."}
+7: {'title': "Insight: Race towards 'autonomous' AI agents grips Silicon Valley | Reuters", 'link': 'https://www.reuters.com/technology/race-towards-autonomous-ai-agents-grips-silicon-valley-2023-07-17/', 'snippet': 'Early efforts are only a taste of the sophistication that could come in future years from increasingly advanced and autonomous agents as the ...'}
+8: {'title': 'Autonomous Agents Market Size, Industry Share, & Forecast 2030', 'link': 'https://www.fortunebusinessinsights.com/autonomous-agents-market-102223', 'snippet': 'The autonomous agents majorly contribute to the industry verticals such as BFSI, IT & telecom, manufacturing, healthcare, transportation & mobility. Autonomous ...'}
+9: {'title': 'Economic potential of generative AI - McKinsey', 'link': 'https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-economic-potential-of-generative-ai-the-next-productivity-frontier', 'snippet': "Generative AI's impact on productivity could add trillions of dollars in value to the global economy—and the era is just beginning."}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.784 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents ecosystem
+
+### The online search results
+0: {'title': 'AI - Agents & Environments - Tutorialspoint', 'link': 'https://www.tutorialspoint.com/artificial_intelligence/artificial_intelligence_agents_and_environments.htm', 'snippet': 'An AI system is composed of an agent and its environment. The agents act in their environment. The environment may contain other agents.'}
+1: {'title': 'Agents in AI: Exploring Intelligent Agents and Its Types, Functions & Composition', 'link': 'https://www.simplilearn.com/what-is-intelligent-agent-in-ai-types-function-article', 'snippet': 'Rule 1: An AI agent must be able to perceive the environment. · Rule 2: The environmental observations must be used to make decisions. · Rule 3: ...'}
+2: {'title': 'AI Infrastructure Ecosystem Report of 2022', 'link': 'https://ai-infrastructure.org/ai-infrastructure-ecosystem-report-of-2022/', 'snippet': 'Our first annual AI Infrastructure Ecosystem report gives teams a comprehensive and clear overview of the entire AI/ML infrastructure landscape.'}
+3: {'title': 'Artificial Intelligence/AI Agents and their Environments - Wikibooks', 'link': 'https://en.wikibooks.org/wiki/Artificial_Intelligence/AI_Agents_and_their_Environments', 'snippet': 'Particular artificial intelligence programs, or AIs, can be thought of as intelligent "agents" that interact with particular environments.'}
+4: {'title': 'What is an AI Agent? Characteristics, Advantages, Challenges, Applications - Simform', 'link': 'https://www.simform.com/blog/ai-agent/', 'snippet': 'The environment refers to the area or domain in which an AI agent operates. It can be a physical space, like a factory floor, or a digital space ...'}
+5: {'title': 'Intelligent Agent | Agents in AI - Javatpoint', 'link': 'https://www.javatpoint.com/agents-in-ai', 'snippet': 'An intelligent agent is an autonomous entity which act upon an environment using sensors and actuators for achieving goals. An intelligent agent may learn from ...'}
+6: {'title': 'Agent ecosystem - Developer Documentation - Fetch.ai', 'link': 'https://docs.fetch.ai/aea-framework-documentation/ecosystem/', 'snippet': 'AEAs are situated within a larger ecosystem comprised of various other systems and technology layers.'}
+7: {'title': 'AI agents in the wild - E2B', 'link': 'https://e2b.dev/blog/ai-agents-in-the-wild', 'snippet': 'Read the latest insights from our journey | E2B offers sandboxed cloud environments for AI agents & AI apps with a single line of code.'}
+8: {'title': 'Intelligent agent - Wikipedia', 'link': 'https://en.wikipedia.org/wiki/Intelligent_agent', 'snippet': 'In artificial intelligence, an intelligent agent (IA) is an agent acting in an intelligent manner; It perceives its environment, takes actions autonomously ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.830 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents applications
+
+### The online search results
+0: {'title': 'What is an AI Agent? Characteristics, Advantages, Challenges, Applications - Simform', 'link': 'https://www.simform.com/blog/ai-agent/', 'snippet': 'Discover the world of AI agents - definition, structure, working method, types, benefits, challenges, and applications revolutionizing ...'}
+1: {'title': 'What is an intelligent agent? | Definition from TechTarget', 'link': 'https://www.techtarget.com/searchenterpriseai/definition/agent-intelligent-agent', 'snippet': 'Agents that use artificial intelligence (AI) and machine learning use sensors ... For enterprises, intelligent agents can be used in data science applications ...'}
+2: {'title': 'What is an AI agent? | Zapier', 'link': 'https://zapier.com/blog/ai-agent/', 'snippet': 'AI agents can use computers extremely well, too. They can browse the web, use apps, read and write files, make payments with your credit card, ...'}
+3: {'title': 'twoday AI Agent – AI app that revolutionises the use of information', 'link': 'https://www.twoday.com/ai-agent', 'snippet': "twoday AI Agent is an AI application that brings all of your company's data easily available and with automation makes heavy processes a thing of the past."}
+4: {'title': 'Agents in Artificial Intelligence - GeeksforGeeks', 'link': 'https://www.geeksforgeeks.org/agents-artificial-intelligence/', 'snippet': 'Agents are used in a variety of applications, including robotics, gaming, and intelligent systems. They can be implemented using different ...'}
+5: {'title': '60 Best Ai agent AI tools - TopAI.tools', 'link': 'https://topai.tools/s/AI-Agent', 'snippet': 'Aide is an AI tool for customer support that can identify and solve support issues in seconds. It uses AI models to learn from data and provide intelligent ...'}
+6: {'title': 'AI Agents: Types, Functions, Advantages & Challenges - Exploring the World of Autonomous Intelligence', 'link': 'https://lablab.ai/blog/the-best-ai-agents-in-2023', 'snippet': 'Each type of agent has its strengths and limitations, making them suitable for different applications and environments. A more detailed ...'}
+7: {'title': 'AI Agent • Supercharge Your Workflows with AI', 'link': 'https://aiagent.app/', 'snippet': 'Workflow automation with AI Agents for everyone. Use cutting-edge technology to free up your time and focus. Try today.'}
+8: {'title': 'How do you work with AI agents? - LinkedIn', 'link': 'https://www.linkedin.com/advice/0/how-do-you-work-ai-agents-skills-artificial-intelligence', 'snippet': 'AI agents are software programs that can perform tasks, interact with users, or learn from data. They can be useful for various applications ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:15:39.903 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+companies creating AI agents
+
+### The online search results
+0: {'title': 'Top AI Agents in 2023 - Slashdot', 'link': 'https://slashdot.org/software/ai-agents/', 'snippet': 'Find the top AI Agents in 2023 for your company. Compare the best AI Agents, read reviews, and learn about pricing and free demos.'}
+1: {'title': "Insight: Race towards 'autonomous' AI agents grips Silicon Valley | Reuters", 'link': 'https://www.reuters.com/technology/race-towards-autonomous-ai-agents-grips-silicon-valley-2023-07-17/', 'snippet': 'In May, Google Ventures led a $2 million seed round in Cognosys, developing AI agents for work productivity, while Hesam Motlagh, who founded ...'}
+2: {'title': 'AWS is ready to power AI agents that can handle busywork instead of just chatting', 'link': 'https://www.theverge.com/2023/7/26/23808730/aws-generative-ai-agents-healthcare-privacy', 'snippet': 'Amazon, along with other AI companies like Meta, Google, and OpenAI, signed an agreement with the White House last week pledging to develop ...'}
+3: {'title': "How 'A.I. Agents' That Roam the Internet Could One Day Replace Workers", 'link': 'https://www.nytimes.com/2023/10/16/technology/ai-agents-workers-replace.html', 'snippet': 'Researchers are transforming chatbots into online agents that play games, query websites, schedule meetings, build bar charts and do more.'}
+4: {'title': 'AI Agent Companies. The Future of Business: A Short Tale | by Harsha Angeri', 'link': 'https://medium.datadriveninvestor.com/ai-agent-companies-4e361ccc46bb', 'snippet': "AI Agent Companies ; Unleashing the Power of Langchain Agents and Tools. A Beginners Guide to building custom tools for Agents · 7 min read ; Run ChatGPT's Code ..."}
+5: {'title': 'Artificial Intelligence Stocks: The 10 Best AI Companies | Investing - U.S. News - Money', 'link': 'https://money.usnews.com/investing/articles/artificial-intelligence-stocks-the-10-best-ai-companies', 'snippet': 'Artificial Intelligence Stocks: The 10 Best AI Companies · Microsoft Corp. (MSFT) · Alphabet Inc. (GOOG, GOOGL) · Nvidia Corp. (NVDA) · Meta ...'}
+6: {'title': 'Amelia, Global Leader in Conversational AI | Amelia', 'link': 'https://amelia.ai/', 'snippet': 'Companies worldwide depend on Amelia digital agents to enhance call centers, customer service and user experiences. Powered by Conversational AI, Amelia manages ...'}
+7: {'title': 'YC-backed Reworkd secures $1.65 million CAD to build AI agents for business tasks', 'link': 'https://betakit.com/yc-backed-reworkd-secures-1-65-million-cad-to-build-ai-agents-for-business-tasks/', 'snippet': 'Canadian-founded, San Francisco-headquartered Reworkd AI is developing an AI agent platform with funding from Panache Ventures and Y ...'}
+8: {'title': 'Launch YC: Reworkd AI - The open-source Zapier of AI agents | Y Combinator', 'link': 'https://www.ycombinator.com/launches/J1r-reworkd-ai-the-open-source-zapier-of-ai-agents', 'snippet': 'As we built out this platform, we noticed a growing trend: businesses were increasingly seeking automation through AI Agents.'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+

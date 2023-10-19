@@ -41,14 +41,16 @@ class Researcher(Role):
             return
 
         if self._rc.state + 1 < len(self._states):
-            self._set_state(self._rc.state + 1)
+            self._set_state(
+                self._rc.state + 1
+            )  # 아 얘네 state 0 부터 차례대로 진행시키겠다는 의미네 0 -> 1 -> 2 -> 3....
         else:
             self._rc.todo = None
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: ready to {self._rc.todo}")
         todo = self._rc.todo
-        msg = self._rc.memory.get(k=1)[0]
+        msg = self._rc.memory.get(k=1)[0]  # 가장 최근의 메모리를 불러온다.
         if isinstance(msg.instruct_content, Report):
             instruct_content = msg.instruct_content
             topic = instruct_content.topic
@@ -57,19 +59,35 @@ class Researcher(Role):
 
         research_system_text = get_research_system_text(topic, self.language)
         if isinstance(todo, CollectLinks):
-            links = await todo.run(topic, 4, 4)
-            ret = Message("", Report(topic=topic, links=links), role=self.profile, cause_by=type(todo))
+            links = await todo.run(topic, 5, 5)
+            ret = Message(
+                "", Report(topic=topic, links=links), role=self.profile, cause_by=type(todo)
+            )  # Message의 instruct_content에 Report type을 넣는다. topic을 계속해서 같은걸로 유지한다.
         elif isinstance(todo, WebBrowseAndSummarize):
             links = instruct_content.links
-            todos = (todo.run(*url, query=query, system_text=research_system_text) for (query, url) in links.items())
+            todos = (
+                todo.run(*url, query=query, system_text=research_system_text)
+                for (query, url) in links.items()
+            )
             summaries = await asyncio.gather(*todos)
-            summaries = list((url, summary) for i in summaries for (url, summary) in i.items() if summary)
-            ret = Message("", Report(topic=topic, summaries=summaries), role=self.profile, cause_by=type(todo))
+            summaries = list(
+                (url, summary) for i in summaries for (url, summary) in i.items() if summary
+            )
+            ret = Message(
+                "", Report(topic=topic, summaries=summaries), role=self.profile, cause_by=type(todo)
+            )
         else:
             summaries = instruct_content.summaries
-            summary_text = "\n---\n".join(f"url: {url}\nsummary: {summary}" for (url, summary) in summaries)
+            summary_text = "\n---\n".join(
+                f"url: {url}\nsummary: {summary}" for (url, summary) in summaries
+            )
             content = await self._rc.todo.run(topic, summary_text, system_text=research_system_text)
-            ret = Message("", Report(topic=topic, content=content), role=self.profile, cause_by=type(self._rc.todo))
+            ret = Message(
+                "",
+                Report(topic=topic, content=content),
+                role=self.profile,
+                cause_by=type(self._rc.todo),
+            )
         self._rc.memory.add(ret)
         return ret
 

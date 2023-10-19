@@ -139,7 +139,6 @@ class SearchAndSummarize(Action):
             QUERY=str(context[-1]),
         )
 
-        logger.debug(prompt)
         result = await self._aask(prompt, system_prompt)
         logger.debug(prompt)
         logger.debug(result)

@@ -1,0 +1,130 @@
+2023-10-19 20:08:06.050 | INFO     | metagpt.config:__init__:44 - Config loading done.
+2023-10-19 20:08:08.085 | DEVELOP  | metagpt.actions.research:__init__:107 - research llm model is gpt-3.5-turbo-16k
+2023-10-19 20:08:08.087 | WARNING  | metagpt.roles.researcher:__init__:36 - The language `eng` has not been tested, it may not work.
+2023-10-19 20:08:08.087 | DEBUG    | metagpt.roles.role:_set_state:134 - [CollectLinks, WebBrowseAndSummarize, ConductResearch]
+2023-10-19 20:08:08.087 | INFO     | metagpt.roles.researcher:_act:51 - David(Researcher): ready to CollectLinks
+2023-10-19 20:08:17.771 | INFO     | metagpt.provider.openai_api:update_cost:89 - Total running cost: $0.001 | Max budget: $10.000 | Current cost: $0.001, prompt_tokens: 147, completion_tokens: 60
+2023-10-19 20:08:17.771 | DEBUG    | metagpt.provider.base_gpt_api:aask:45 - [{'role': 'system', 'content': 'You are an AI researcher assistant, and your research topic is:\nDo a report on industry and companies about creating an AI agents ecosystem.\n'}, {'role': 'system', 'content': 'You are a Researcher, named David, your goal is Gather information and conduct research, and the constraint is Ensure accuracy and relevance of information. '}, {'role': 'user', 'content': 'Please provide just upto {keyword_num} important keyword related to your research topic for Google search. You should imagine like human and make a keyword like human. find most nice keyword that is most efficient to find ideal result.\nYour response must be in JSON format, for example: ["keyword1",...].\n### Requirements : Remember you should give upto {keyword_num} keyword\n'}]
+2023-10-19 20:08:17.771 | DEVELOP  | metagpt.actions.research:run:130 - ["AI agents ecosystem", "industry trends in AI agents", "companies creating AI agents", "AI agents market analysis", "AI agents platform development", "AI agents technology advancements", "AI agents applications", "AI agents use cases", "AI agents market growth", "AI agents challenges and opportunities"]
+2023-10-19 20:08:18.593 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents market analysis
+
+### The online search results
+0: {'title': 'Autonomous AI and Autonomous Agents Market Share & Size, Global Trends, Statistics, Growth Forecast | MarketsandMarkets', 'link': 'https://www.marketsandmarkets.com/Market-Reports/autonomous-ai-and-autonomous-agents-market-208190735.html', 'snippet': '[375 Pages Report] The global Autonomous AI and Autonomous Agents Market size as per revenue was exceeded $4.8 billion in 2023 and is poised ...'}
+1: {'title': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the forecast period', 'link': 'https://www.globenewswire.com/news-release/2023/08/30/2734611/0/en/The-Global-Autonomous-AI-and-Autonomous-Agents-Market-size-is-expected-to-reach-51-2-billion-by-2030-rising-at-a-market-growth-of-40-7-CAGR-during-the-forecast-period.html', 'snippet': 'Under software type, the market is bifurcated into computational agents and robotic agents. In 2022, the computational agents segment witnessed ...'}
+2: {'title': 'Autonomous AI and Autonomous Agents Market Potential Growth and Trends - LinkedIn', 'link': 'https://www.linkedin.com/pulse/autonomous-ai-agents-market-potential-growth-trends-sayee-das', 'snippet': 'The market for Autonomous AI and Autonomous Agents is estimated to grow from USD 4.8 billion in 2023 to USD 28.5 billion by 2028, at a CAGR of ...'}
+3: {'title': 'Autonomous AI and Autonomous Agents Market worth $28.5 billion by 2028 - Exclusive Report by MarketsandMarkets™ - PR Newswire', 'link': 'https://www.prnewswire.com/news-releases/autonomous-ai-and-autonomous-agents-market-worth-28-5-billion-by-2028---exclusive-report-by-marketsandmarkets-301854064.html', 'snippet': 'The Autonomous AI and Autonomous Agents Market is estimated to grow from USD 4.8 billion in 2023 to USD 28.5 billion by 2028, at a CAGR of 43.0% ...'}
+4: {'title': 'Autonomous Agents Market Size, Industry Share, & Forecast 2030', 'link': 'https://www.fortunebusinessinsights.com/autonomous-agents-market-102223', 'snippet': 'Autonomous Agents Market report summarizes top key players overview as Oracle Corporation, International Business Machines (IBM) Corporation, SAP SE, ...'}
+5: {'title': 'Artificial Intelligence Market Size, Share, Growth Report 2030 - Grand View Research', 'link': 'https://www.grandviewresearch.com/industry-analysis/artificial-intelligence-ai-market', 'snippet': 'The global artificial intelligence market size was valued at USD 136.55 billion in 2022 and is projected to expand at a compound annual growth rate (CAGR) of ...'}
+6: {'title': 'Autonomous Agents Market Statistics & Growth | Forecast', 'link': 'https://www.alliedmarketresearch.com/autonomous-agents-market-A06812', 'snippet': 'The report provides detailed autonomous agents market analysis based on competitive intensity and how the competition will take shape in coming years.'}
+7: {'title': 'Autonomous AI and Autonomous Agents Market Size, Share & Industry Analysis 2032', 'link': 'https://www.marketresearchfuture.com/reports/autonomous-ai-autonomous-agents-market-12255', 'snippet': 'Autonomous AI and autonomous agents market industry is projected to grow from USD 6.03 Billion in 2023 to USD 110.42 Billion by 2032.'}
+8: {'title': 'AI ChatGPT-Powered Market Analysis: Game-Changing Feature for Real Estate Marketing', 'link': 'https://blog.narrpr.com/tips/ai-powered-market-analysis/', 'snippet': 'Elevate your marketing efforts with this innovative new tool! RPR has integrated with ChatGPT to help REALTORS® craft personalized video scripts, ...'}
+9: {'title': 'Autonomous AI and Autonomous Agents Market Size, Share, 2030 - KBV Research', 'link': 'https://www.kbvresearch.com/autonomous-ai-and-autonomous-agents-market/', 'snippet': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:08:18.611 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents market growth
+
+### The online search results
+0: {'title': 'Autonomous AI and Autonomous Agents Market Share & Size, Global Trends, Statistics, Growth Forecast | MarketsandMarkets', 'link': 'https://www.marketsandmarkets.com/Market-Reports/autonomous-ai-and-autonomous-agents-market-208190735.html', 'snippet': '[375 Pages Report] The global Autonomous AI and Autonomous Agents Market size as per revenue was exceeded $4.8 billion in 2023 and is poised ...'}
+1: {'title': 'Autonomous AI and Autonomous Agents Market Potential Growth and Trends - LinkedIn', 'link': 'https://www.linkedin.com/pulse/autonomous-ai-agents-market-potential-growth-trends-sayee-das', 'snippet': 'The market for Autonomous AI and Autonomous Agents is estimated to grow from USD 4.8 billion in 2023 to USD 28.5 billion by 2028, at a CAGR of ...'}
+2: {'title': 'Generative AI to Become a $1.3 Trillion Market by 2032, Research Finds - Bloomberg.com', 'link': 'https://www.bloomberg.com/company/press/generative-ai-to-become-a-1-3-trillion-market-by-2032-research-finds/', 'snippet': 'Bloomberg Intelligence: New Report Finds That the Emerging Industry Could Grow at a CAGR of 42% Over the Next 10 Years. Rising demand for generative AI ...'}
+3: {'title': 'Artificial Intelligence market size 2030 - Statista', 'link': 'https://www.statista.com/statistics/1365145/artificial-intelligence-market-size/', 'snippet': 'Its value of nearly 100 billion U.S. dollars is expected to grow twentyfold by 2030, up to nearly two trillion U.S. dollars. The AI market ...'}
+4: {'title': 'Artificial Intelligence - Global | Statista Market Forecast', 'link': 'https://www.statista.com/outlook/tmo/artificial-intelligence/worldwide', 'snippet': 'The market size in the Artificial Intelligence market is projected to reach US$241.80bn in 2023. The market size is expected to show an annual growth rate ...'}
+5: {'title': 'Autonomous AI and Autonomous Agents Market Size, Share, 2030 - KBV Research', 'link': 'https://www.kbvresearch.com/autonomous-ai-and-autonomous-agents-market/', 'snippet': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the ...'}
+6: {'title': 'Autonomous AI and Autonomous Agents Market worth $28.5 billion by 2028 - Exclusive Report by MarketsandMarkets™ - PR Newswire', 'link': 'https://www.prnewswire.com/news-releases/autonomous-ai-and-autonomous-agents-market-worth-28-5-billion-by-2028---exclusive-report-by-marketsandmarkets-301854064.html', 'snippet': 'The Autonomous AI and Autonomous Agents Market is estimated to grow from USD 4.8 billion in 2023 to USD 28.5 billion by 2028, at a CAGR of ...'}
+7: {'title': 'Artificial Intelligence (AI) Market Size, Growth, Report By 2032 - Precedence Research', 'link': 'https://www.precedenceresearch.com/artificial-intelligence-market', 'snippet': 'The global artificial intelligence (AI) market size was valued at USD 454.12 billion in 2022 and is expected to hit around USD 2,575.16 billion by 2032, ...'}
+8: {'title': 'Artificial Intelligence Market Size, Share, Growth Report 2030 - Grand View Research', 'link': 'https://www.grandviewresearch.com/industry-analysis/artificial-intelligence-ai-market', 'snippet': 'The global artificial intelligence market size was valued at USD 136.55 billion in 2022 and is projected to expand at a compound annual growth rate (CAGR) of ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:08:18.667 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+industry trends in AI agents
+
+### The online search results
+0: {'title': 'Autonomous AI and Autonomous Agents Market Potential Growth and Trends - LinkedIn', 'link': 'https://www.linkedin.com/pulse/autonomous-ai-agents-market-potential-growth-trends-sayee-das', 'snippet': 'Autonomous AI & autonomous agents are software programs that can perform specific tasks without human intervention.'}
+1: {'title': 'The Global Autonomous AI and Autonomous Agents Market size is expected to reach $51.2 billion by 2030, rising at a market growth of 40.7% CAGR during the forecast period', 'link': 'https://www.globenewswire.com/news-release/2023/08/30/2734611/0/en/The-Global-Autonomous-AI-and-Autonomous-Agents-Market-size-is-expected-to-reach-51-2-billion-by-2030-rising-at-a-market-growth-of-40-7-CAGR-during-the-forecast-period.html', 'snippet': 'In the BFSI industry, autonomous AI systems use machine learning algorithms to evaluate enormous volumes of financial data, detect trends, and ...'}
+2: {'title': 'Autonomous AI and Autonomous Agents Market Share & Size, Global Trends, Statistics, Growth Forecast | MarketsandMarkets', 'link': 'https://www.marketsandmarkets.com/Market-Reports/autonomous-ai-and-autonomous-agents-market-208190735.html', 'snippet': '[375 Pages Report] Autonomous AI and autonomous agents market size, share, analysis, trends & forecasts. The global market for autonomous AI ...'}
+3: {'title': 'AI Agents and IoT Integration: Shaping Industries and Our Daily Lives - Inclusion Cloud', 'link': 'https://inclusioncloud.com/insights/blog/ai-agents-reshaping-business/', 'snippet': 'By using AI agents to analyze this data, companies can gain insights into customer behavior, market trends, and other key metrics. Real-Life ...'}
+4: {'title': 'How Autonomous AI Agents are Reshaping Industries and Redefining Expertise - Xyonix', 'link': 'https://www.xyonix.com/blog/how-autonomous-ai-agents-are-reshaping-industries-and-redefining-expertise', 'snippet': "To understand this trend, take GitHub's Copilot, an AI-powered code completion assistant. This tool has the potential to overhaul previous ..."}
+5: {'title': 'Autonomous AI and Autonomous Agents Market worth $28.5 billion by 2028 - Exclusive Report by MarketsandMarkets™ - PR Newswire', 'link': 'https://www.prnewswire.com/news-releases/autonomous-ai-and-autonomous-agents-market-worth-28-5-billion-by-2028---exclusive-report-by-marketsandmarkets-301854064.html', 'snippet': 'Autonomous AI systems can offer insightful analysis and suggestions to help people make decisions. They can find trends, make predictions, and ...'}
+6: {'title': "Insight: Race towards 'autonomous' AI agents grips Silicon Valley | Reuters", 'link': 'https://www.reuters.com/technology/race-towards-autonomous-ai-agents-grips-silicon-valley-2023-07-17/', 'snippet': '... industry and artificial intelligence. He ... From startups to the FAANGs, get the latest news and trends in the global technology industry.'}
+7: {'title': 'Emerging Trends in Artificial Intelligence for Intelligent Industrial Applications - Wiley Online Library', 'link': 'https://onlinelibrary.wiley.com/pb-assets/assets/14680394/Emerging%20Trends%20in%20Artificial%20Intelligence%20for%20Intelligent%20Industrial%20Applications%20(002).pdf', 'snippet': 'His research areas are Software Engineering, Software. Agents, and Emerging Development Techniques in Video Game and Entertainment Software. He has ...'}
+8: {'title': 'Biggest AI Trends Transforming the Customer Service Industry - AiThority', 'link': 'https://aithority.com/machine-learning/biggest-ai-trends-transforming-the-customer-service-industry/', 'snippet': '58% of service organizations across various industries rely on process or workflow automation technologies to achieve efficiency. With agent ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:08:18.692 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents applications
+
+### The online search results
+0: {'title': 'What is an AI Agent? Characteristics, Advantages, Challenges, Applications - Simform', 'link': 'https://www.simform.com/blog/ai-agent/', 'snippet': 'AI agents can provide personalized and timely interactions with customers, enhancing their experience. They can offer instant support, answer ...'}
+1: {'title': 'Agents in Artificial Intelligence - GeeksforGeeks', 'link': 'https://www.geeksforgeeks.org/agents-artificial-intelligence/', 'snippet': 'Agents are used in a variety of applications, including robotics, gaming, and intelligent systems. They can be implemented using different ...'}
+2: {'title': 'What is an intelligent agent? | Definition from TechTarget', 'link': 'https://www.techtarget.com/searchenterpriseai/definition/agent-intelligent-agent', 'snippet': 'An intelligent agent is a program that can make decisions or perform a service based on its environment, user input and experiences. These programs can be ...'}
+3: {'title': 'What is an AI agent? | Zapier', 'link': 'https://zapier.com/blog/ai-agent/', 'snippet': 'AI Agent is a flexible app that lets you create your own agents, by picking a name, an objective, and the AI model it should use (GPT-3.5 Turbo ...'}
+4: {'title': 'twoday AI Agent – AI app that revolutionises the use of information', 'link': 'https://www.twoday.com/ai-agent', 'snippet': "twoday AI Agent is an unique artificial intelligence application that boosts organisations' information search and data processing and automates customer ..."}
+5: {'title': 'Open Source AI Agents to Watch - MLQ.ai', 'link': 'https://www.mlq.ai/open-source-ai-agents/', 'snippet': 'The three open-source AI agents that were are focussed on right now include Autogen, AutoGPT, and Baby AGI. All three of these have been built ...'}
+6: {'title': 'AI Agents: Types, Functions, Advantages & Challenges - Exploring the World of Autonomous Intelligence', 'link': 'https://lablab.ai/blog/the-best-ai-agents-in-2023', 'snippet': 'Real-Life Applications of AI Agents AI agents have a wide range of applications in different fields, such as natural language processing, ...'}
+7: {'title': '60 Best Ai agent AI tools - TopAI.tools', 'link': 'https://topai.tools/s/AI-Agent', 'snippet': 'AI Agent is a web app that allows users to create customized AI agents to perform specific tasks and achieve goals. The AI Agent works by breaking down ...'}
+8: {'title': 'AI Agent • Supercharge Your Workflows with AI', 'link': 'https://aiagent.app/', 'snippet': 'A web app that makes choices and performs tasks on its own, based on the goals set by you. · Breaking down your goal into smaller tasks and completing them one ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:08:18.702 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents technology advancements
+
+### The online search results
+0: {'title': 'Latest Developments in Autonomous AI Agents - LinkedIn', 'link': 'https://www.linkedin.com/pulse/latest-developments-autonomous-ai-agents-lijin-thomas-abraham-pmp', 'snippet': "Welcome to our interactive newsletter! In this edition, we'll explore the latest advancements in the world of Autonomous AI Agents."}
+1: {'title': 'Autonomous AI Agent. The next AI revolution after chatGPT | by agent007GPT - Medium', 'link': 'https://medium.com/@agent007gpt/autonomous-ai-agent-c947f7e58a94', 'snippet': 'Chatbots have been significant applications of advancements in AI, leveraging natural language processing and machine learning to converse with ...'}
+2: {'title': 'Unveiling the Power of AI Agents: Top 5 Most Popular AI Agents in 2023 | by ILLA Cloud', 'link': 'https://medium.com/@Illasoft/unveiling-the-power-of-ai-agents-top-5-most-popular-ai-agents-in-2023-3de4420a1843', 'snippet': 'In the ever-evolving landscape of artificial intelligence, AI agents stand at the forefront of groundbreaking technological advancements.'}
+3: {'title': 'SQ2. What are the most important advances in AI? | One Hundred Year Study on Artificial Intelligence (AI100) - Stanford University', 'link': 'https://ai100.stanford.edu/gathering-strength-gathering-storms-one-hundred-year-study-artificial-intelligence-ai100-2021-1/sq2', 'snippet': 'The core technology behind most of the most visible advances is machine learning, especially deep learning (including generative adversarial networks or GANs) ...'}
+4: {'title': 'How Autonomous AI Agents are Reshaping Industries and Redefining Expertise - Xyonix', 'link': 'https://www.xyonix.com/blog/how-autonomous-ai-agents-are-reshaping-industries-and-redefining-expertise', 'snippet': 'Recent advancements in AI technology have reshaped everyday life and industries, introducing autonomous functionality in products like ...'}
+5: {'title': "Insight: Race towards 'autonomous' AI agents grips Silicon Valley | Reuters", 'link': 'https://www.reuters.com/technology/race-towards-autonomous-ai-agents-grips-silicon-valley-2023-07-17/', 'snippet': 'The new technology has triggered a rush towards assistants powered by so-called foundation models including GPT-4, sweeping up individual ...'}
+6: {'title': 'Recent Advancements In Artificial Intelligence - Forbes', 'link': 'https://www.forbes.com/sites/forbesbusinesscouncil/2022/10/07/recent-advancements-in-artificial-intelligence/?sh=24a1ec8e7fa5', 'snippet': 'As AI continues to develop at an exponential rate, it is transforming the business world. Leveraging AI technologies can be a source of durable ...'}
+7: {'title': 'Disruptive AI Tech: Know About The New Era Of Autonomous Agents - IndiaTimes', 'link': 'https://www.indiatimes.com/explainers/news/what-is-disruptive-ai-technology-600311.html', 'snippet': 'Based on numerous research and expert commentaries, it is learned that the development of autonomous agents requires deep knowledge of AI, ...'}
+8: {'title': 'Technology and innovation: Building the superhuman agent | McKinsey', 'link': 'https://www.mckinsey.com/capabilities/operations/our-insights/technology-and-innovation-building-the-superhuman-agent', 'snippet': 'Researchers, academics, and innovative organizations have produced a seemingly never-ending wave of tech-based breakthroughs that keep resetting ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+
+2023-10-19 20:08:18.771 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:166 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents platform development
+
+### The online search results
+0: {'title': 'AI Agents Platform', 'link': 'https://www.agents.inc/ai-agents-platform/', 'snippet': 'Designed to seamlessly connect users with a diverse range of intelligent agents, this platform opens the door to limitless possibilities in data analysis, ...'}
+1: {'title': 'The Future of App Development: AI Agents Leading the Way - LinkedIn', 'link': 'https://www.linkedin.com/pulse/future-app-development-ai-agents-leading-way-jasper-hallamore', 'snippet': "Let's explore how AI agents are revolutionising the app development landscape and becoming indispensable tools for developers seeking efficiency ..."}
+2: {'title': 'How do you work with AI agents? - LinkedIn', 'link': 'https://www.linkedin.com/advice/0/how-do-you-work-ai-agents-skills-artificial-intelligence', 'snippet': 'AI agents are software programs that can perform tasks, interact with users, or learn from data. They can be useful for various applications ...'}
+3: {'title': 'What is an AI agent? | Zapier', 'link': 'https://zapier.com/blog/ai-agent/', 'snippet': 'AI Agent is a flexible app that lets you create your own agents, by picking a name, an objective, and the AI model it should use (GPT-3.5 Turbo ...'}
+4: {'title': 'Rapidly build an application in Gradio power by a Generative AI Agent | Google Cloud Blog', 'link': 'https://cloud.google.com/blog/products/ai-machine-learning/rapidly-build-an-application-in-gradio-power-by-a-generative-ai-agent', 'snippet': 'Vertex AI Conversation allows developers with limited machine learning skills to tap into the power of conversational AI technologies, and ...'}
+5: {'title': 'e2b-dev/awesome-ai-agents: A list of AI autonomous agents - GitHub', 'link': 'https://github.com/e2b-dev/awesome-ai-agents', 'snippet': '... AI framework to enable development and deployment autonomous agents ... Airkit is a developer-first platform for building, testing, and deploying AI Agents.'}
+6: {'title': 'Specialized Freelance Services in AI Agents - Fiverr', 'link': 'https://www.fiverr.com/categories/programming-tech/ai-coding/ai-agents-development', 'snippet': 'Find top-notch freelance services for AI Agents. From virtual assistants to customer service bots, we provide customized AI solutions for you.'}
+7: {'title': 'Vital AI', 'link': 'https://www.vital.ai/', 'snippet': 'Software and Consulting. We provide the Vital Development Kit for development of artificial intelligence applications, and the Haley AI agent platform.'}
+8: {'title': "Using AI Agents to Free LLMops' Creativity: A Revolution in Application Development | by ILLA Cloud | Medium", 'link': 'https://medium.com/@Illasoft/using-ai-agents-to-free-llmops-creativity-a-revolution-in-application-development-e7e6f4cb00ec', 'snippet': 'The AI Agent Marketplace on ILLA Cloud is a game-changer, providing access to a diverse range of AI agents, from data analysis wizards to ...'}
+9: {'title': '60 Best Ai agent AI tools - TopAI.tools', 'link': 'https://topai.tools/s/AI-Agent', 'snippet': 'AgentRunner.ai is an autonomous AI agent creation tool that leverages the power of GPT-4 to create and train fully autonomous agents. It allows users to set ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
+

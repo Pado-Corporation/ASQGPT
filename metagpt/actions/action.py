@@ -16,6 +16,8 @@ from metagpt.llm import LLM
 from metagpt.logs import logger
 from metagpt.utils.common import OutputParser
 from metagpt.utils.custom_decoder import CustomDecoder
+import asyncio
+import random
 
 
 class Action(ABC):
@@ -47,7 +49,13 @@ class Action(ABC):
         if not system_msgs:
             system_msgs = []
         system_msgs.append(self.prefix)
-        return await self.llm.aask(prompt, system_msgs)
+        for i in range(20):
+            try:
+                return await self.llm.aask(prompt, system_msgs)  # 성공하면 루프를 나갑니다.
+            except:
+                print("서버가 과부하 상태이거나 준비되지 않았습니다. 재시도합니다.")
+                await asyncio.sleep(random.uniform(0, 1))  # 0~1초 사이를 랜덤으로 기다립니다.
+        raise EOFError
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     async def _aask_v1(

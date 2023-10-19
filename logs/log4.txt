@@ -1,0 +1,27 @@
+2023-10-19 19:50:28.620 | INFO     | metagpt.config:__init__:44 - Config loading done.
+2023-10-19 19:50:30.636 | DEVELOP  | metagpt.actions.research:__init__:106 - research llm model is gpt-3.5-turbo-16k
+2023-10-19 19:50:30.638 | WARNING  | metagpt.roles.researcher:__init__:36 - The language `eng` has not been tested, it may not work.
+2023-10-19 19:50:30.638 | DEBUG    | metagpt.roles.role:_set_state:134 - [CollectLinks, WebBrowseAndSummarize, ConductResearch]
+2023-10-19 19:50:30.638 | INFO     | metagpt.roles.researcher:_act:51 - David(Researcher): ready to CollectLinks
+2023-10-19 19:50:34.963 | INFO     | metagpt.provider.openai_api:update_cost:89 - Total running cost: $0.001 | Max budget: $10.000 | Current cost: $0.001, prompt_tokens: 147, completion_tokens: 26
+2023-10-19 19:50:34.963 | DEBUG    | metagpt.provider.base_gpt_api:aask:45 - [{'role': 'system', 'content': 'You are an AI researcher assistant, and your research topic is:\nDo a report on industry and companies about creating an AI agents ecosystem.\n'}, {'role': 'system', 'content': 'You are a Researcher, named David, your goal is Gather information and conduct research, and the constraint is Ensure accuracy and relevance of information. '}, {'role': 'user', 'content': 'Please provide just upto {keyword_num} important keyword related to your research topic for Google search. You should imagine like human and make a keyword like human. find most nice keyword that is most efficient to find ideal result.\nYour response must be in JSON format, for example: ["keyword1",...].\n### Requirements : Remember you should give upto {keyword_num} keyword\n'}]
+2023-10-19 19:50:34.964 | DEVELOP  | metagpt.actions.research:run:129 - ["AI agents ecosystem", "AI agents industry", "companies creating AI agents", "AI agents market", "AI agents development"]
+2023-10-19 19:50:35.998 | DEBUG    | metagpt.actions.research:_search_and_rank_urls:160 - 
+Your role is ranking every url based on relevancy between query and result snippet
+### Query
+AI agents ecosystem
+
+### The online search results
+0: {'title': 'AI - Agents & Environments - Tutorialspoint', 'link': 'https://www.tutorialspoint.com/artificial_intelligence/artificial_intelligence_agents_and_environments.htm', 'snippet': 'An AI system is composed of an agent and its environment. The agents act in their environment. The environment may contain other agents.'}
+1: {'title': 'Towards the AI Agent Ecosystem - Activant Capital', 'link': 'https://activantcapital.com/research/ai-agents/', 'snippet': "In essence, the Agents are continuously learning from each other's experiences, coalescing around promising or unexplored avenues of action."}
+2: {'title': 'What is an AI Agent? Characteristics, Advantages, Challenges, Applications - Simform', 'link': 'https://www.simform.com/blog/ai-agent/', 'snippet': 'The environment refers to the area or domain in which an AI agent operates. It can be a physical space, like a factory floor, or a digital space ...'}
+3: {'title': 'AI Infrastructure Ecosystem Report of 2022', 'link': 'https://ai-infrastructure.org/ai-infrastructure-ecosystem-report-of-2022/', 'snippet': 'Our first annual AI Infrastructure Ecosystem report gives teams a comprehensive and clear overview of the entire AI/ML infrastructure landscape.'}
+4: {'title': 'Artificial Intelligence/AI Agents and their Environments - Wikibooks', 'link': 'https://en.wikibooks.org/wiki/Artificial_Intelligence/AI_Agents_and_their_Environments', 'snippet': 'Particular artificial intelligence programs, or AIs, can be thought of as intelligent "agents" that interact with particular environments.'}
+5: {'title': 'Agent ecosystem - Developer Documentation - Fetch.ai', 'link': 'https://docs.fetch.ai/aea-framework-documentation/ecosystem/', 'snippet': 'AEAs are situated within a larger ecosystem comprised of various other systems and technology layers.'}
+6: {'title': 'Intelligent agent - Wikipedia', 'link': 'https://en.wikipedia.org/wiki/Intelligent_agent', 'snippet': 'In artificial intelligence, an intelligent agent (IA) is an agent acting in an intelligent manner; It perceives its environment, takes actions autonomously ...'}
+7: {'title': 'AI agents in the wild - E2B', 'link': 'https://e2b.dev/blog/ai-agents-in-the-wild', 'snippet': 'Read the latest insights from our journey | E2B offers sandboxed cloud environments for AI agents & AI apps with a single line of code.'}
+8: {'title': 'AI agents and task environments - FutureLearn', 'link': 'https://www.futurelearn.com/info/courses/introduction-artificial-intelligence-tourism/0/steps/264845', 'snippet': 'Environments is everything in the world which surrounds the agent. It could be a physical world / a real world or a virtual one. So the environment is where the ...'}
+
+### Requirements
+- rank results' indices in JSON format, like [0, 1, 3, 4, ...], without including other words.
+

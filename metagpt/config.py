@@ -67,8 +67,12 @@ class Config(metaclass=Singleton):
         self.serper_api_key = self._get("SERPER_API_KEY")
         self.google_api_key = self._get("GOOGLE_API_KEY")
         self.google_cse_id = self._get("GOOGLE_CSE_ID")
-        self.search_engine = SearchEngineType(self._get("SEARCH_ENGINE", SearchEngineType.SERPAPI_GOOGLE))
-        self.web_browser_engine = WebBrowserEngineType(self._get("WEB_BROWSER_ENGINE", WebBrowserEngineType.PLAYWRIGHT))
+        self.search_engine = SearchEngineType(
+            self._get("SEARCH_ENGINE", SearchEngineType.SERPAPI_GOOGLE)
+        )
+        self.web_browser_engine = WebBrowserEngineType(
+            self._get("WEB_BROWSER_ENGINE", WebBrowserEngineType.PLAYWRIGHT)
+        )
         self.playwright_browser_type = self._get("PLAYWRIGHT_BROWSER_TYPE", "chromium")
         self.selenium_browser_type = self._get("SELENIUM_BROWSER_TYPE", "chrome")
 
@@ -83,6 +87,7 @@ class Config(metaclass=Singleton):
         self.calc_usage = self._get("CALC_USAGE", True)
         self.model_for_researcher_summary = self._get("MODEL_FOR_RESEARCHER_SUMMARY")
         self.model_for_researcher_report = self._get("MODEL_FOR_RESEARCHER_REPORT")
+        self.model_for_researcher_keyword = self._get("MODEL_FOR_RESEARCHER_KEYWORD")
         self.mermaid_engine = self._get("MERMAID_ENGINE", "nodejs")
         self.pyppeteer_executable_path = self._get("PYPPETEER_EXECUTABLE_PATH", "")
 

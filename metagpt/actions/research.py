@@ -15,35 +15,37 @@ from metagpt.tools.search_engine import SearchEngine
 from metagpt.tools.web_browser_engine import WebBrowserEngine, WebBrowserEngineType
 from metagpt.utils.common import OutputParser
 from metagpt.utils.text import generate_prompt_chunk, reduce_message_length
+from openai.error import ServiceUnavailableError
+import random
 
 LANG_PROMPT = "Please respond in {language}."
 
 RESEARCH_BASE_SYSTEM = """You are an AI critical thinker research assistant. Your sole purpose is to write well \
 written, critically acclaimed, objective and structured reports on the given text."""
 
-RESEARCH_TOPIC_SYSTEM = (
-    "You are an AI researcher assistant, and your research topic is:\n#TOPIC#\n{topic}"
-)
+RESEARCH_TOPIC_SYSTEM = "You are an AI researcher assistant, and your research topic is:\n{topic}\n"
 
-SEARCH_TOPIC_PROMPT = """Please provide necessary keywords related to your research topic for Google search. and mix it korean version and english version.\
-You should imagine like human and make a keyword like human. find keyword that is most efficient to find ideal result.
-Give me as many different keywords as possible to accomplish my goals, just in case I can't find the necessary information. 
-You need to be able to accomplish all of goals through the keyword searches you provide.
-Your response must be in JSON format, for example: ["keyword1", "keyword2"]."""
+SEARCH_TOPIC_PROMPT = """Please provide just upto {keyword_num} important keyword related to your research topic for Google search. \
+You should imagine like human and make a keyword like human. find most nice keyword that is most efficient to find ideal result.
+Your response must be in JSON format, for example: ["keyword1",...].
+### Requirements : Remember you should give upto {keyword_num} keyword
+"""
 
-SUMMARIZE_SEARCH_PROMPT = """### Requirements
+SUMMARIZE_SEARCH_PROMPT = """
+### Requirements
+
 1. The keywords related to your research topic and the search results are shown in the "Search Result Information" section.
 2. Provide up to {decomposition_nums} queries related to your research topic base on the search results.
 3. Please respond in the following JSON format: ["query1", "query2", "query3", ...].
 4. mix it korean version and english version.
-5. You should imagine like human and make a keyword like human. find keyword that is most efficient to find ideal result.
+5. It's a good idea to pick keywords that are meaningful in order to *gather as much information as possible* to achieve your topic.
 
 ### Search Result Information
 {search_results}
 """
 
-COLLECT_AND_RANKURLS_PROMPT = """### Topic
-{topic}
+COLLECT_AND_RANKURLS_PROMPT = """
+Your role is ranking every url based on relevancy between query and result snippet
 ### Query
 {query}
 
@@ -51,9 +53,8 @@ COLLECT_AND_RANKURLS_PROMPT = """### Topic
 {results}
 
 ### Requirements
-Please remove irrelevant search results that are not related to the query or topic. Then, sort the remaining search results \
-based on the link credibility. If two results have equal credibility, prioritize them based on the relevance. Provide the
-ranked results' indices in JSON format, like [0, 1, 3, 4, ...], without including other words.
+- rank results' indices in JSON format, like [0, 1, 3, 2, ...], without including other words.
+- No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
 """
 
 WEB_BROWSE_AND_SUMMARIZE_PROMPT = """### Requirements
@@ -62,13 +63,15 @@ WEB_BROWSE_AND_SUMMARIZE_PROMPT = """### Requirements
 a comprehensive summary of the text.
 3. If the text is entirely unrelated to the research topic, please reply with a simple text "Not relevant."
 4. Include all relevant factual information, numbers, statistics, etc., if available.
+5. If you can't access, then Just tell me "I can't access link"
 
 ### Reference Information
 {content}
 """
 
 
-CONDUCT_RESEARCH_PROMPT = """### Reference Information
+CONDUCT_RESEARCH_PROMPT = """
+### Reference Information
 {content}
 
 ### Requirements
@@ -80,12 +83,19 @@ above. The report must meet the following requirements:
 - Present data and findings in an intuitive manner, utilizing feature comparative tables, if applicable.
 - The report should have a minimum word count of 2,000 and be formatted with Markdown syntax following APA style guidelines.
 - Include all source URLs in APA format at the end of the report.
+- The above summary may not be accurate. Therefore, if you have conflicting information from different sources, use the more reliable information.
+- If the numbers in summary are inconsistent with your common sense, correct them using your prior knowledge. When corrected, tag (fixed) and what indicate on report which part fixed.
+- Make sure to include the essential information in each URL to create a natural logical flow.  
+- Remember you should make a report.
+- Make sure to include the link you referenced in, and Put all the links you refer to in the reference part.
+- *Never make it up. Never Make a User review or something, Write everything based on reference information*
 """
 
 
 class CollectLinks(Action):
     """Action class to collect links from a search engine."""
 
+    # 얘는 기본적으로 GPT4 이용
     def __init__(
         self,
         name: str = "",
@@ -97,11 +107,14 @@ class CollectLinks(Action):
         self.desc = "Collect links from a search engine."
         self.search_engine = SearchEngine()
         self.rank_func = rank_func
+        if CONFIG.model_for_researcher_keyword:
+            self.llm.model = CONFIG.model_for_researcher_keyword
+        logger.log("DEVELOP", "research llm model is " + self.llm.model)
 
     async def run(
         self,
         topic: str,
-        decomposition_nums: int = 4,
+        keyword_num: int = 4,
         url_per_query: int = 4,
         system_text: str | None = None,
     ) -> dict[str, list[str]]:
@@ -109,7 +122,7 @@ class CollectLinks(Action):
 
         Args:
             topic: The research topic.
-            decomposition_nums: The number of search questions to generate.
+            keyword_num: The number of search query to generate.
             url_per_query: The number of URLs to collect per search question.
             system_text: The system text.
 
@@ -117,50 +130,25 @@ class CollectLinks(Action):
             A dictionary containing the search questions as keys and the collected URLs as values.
         """
         system_text = system_text if system_text else RESEARCH_TOPIC_SYSTEM.format(topic=topic)
-        keywords = await self._aask(SEARCH_TOPIC_PROMPT, [system_text])
-
-        try:
-            keywords = OutputParser.extract_struct(keywords, list)
-            keywords = parse_obj_as(list[str], keywords)
-        except Exception as e:
-            logger.exception(
-                f'fail to get keywords related to the research topic "{topic}" for {e}'
-            )
-            keywords = [topic]
-        results = await asyncio.gather(
-            *(self.search_engine.run(i, as_string=False) for i in keywords)
-        )
-
-        def gen_msg():
-            while True:
-                search_results = "\n".join(
-                    f"#### Keyword: {i}\n Search Result: {j}\n" for (i, j) in zip(keywords, results)
-                )
-                prompt = SUMMARIZE_SEARCH_PROMPT.format(
-                    decomposition_nums=decomposition_nums, search_results=search_results
-                )
-                yield prompt
-                remove = max(results, key=len)
-                remove.pop()
-                if len(remove) == 0:
-                    break
-
-        prompt = reduce_message_length(
-            gen_msg(), self.llm.model, system_text, CONFIG.max_tokens_rsp
-        )
-        logger.debug(prompt)
-        queries = await self._aask(prompt, [system_text])
-        print("quries:", queries)
+        search_topic_prompt = SEARCH_TOPIC_PROMPT.format(keyword_num=keyword_num)
+        queries = await self._aask(search_topic_prompt, [system_text])
+        logger.log("DEVELOP", queries)
         try:
             queries = OutputParser.extract_struct(queries, list)
             queries = parse_obj_as(list[str], queries)
         except Exception as e:
-            logger.exception(f"fail to break down the research question due to {e}")
-            queries = keywords
+            logger.exception(
+                f'fail to get keywords related to the research topic "{topic}" for {e}'
+            )
+            queries = [topic]
         ret = {}
+        tasks = []
         for query in queries:
-            ret[query] = await self._search_and_rank_urls(topic, query, url_per_query)
-        print("result:", ret)
+            task = self._search_and_rank_urls(topic, query, url_per_query)
+            tasks.append(task)
+        results = await asyncio.gather(*tasks)
+        for i, query in enumerate(queries):
+            ret[query] = results[i]
         return ret
 
     async def _search_and_rank_urls(
@@ -171,7 +159,7 @@ class CollectLinks(Action):
         Args:
             topic: The research topic.
             query: The search query.
-            num_results: The number of URLs to collect.
+            num_results: The number of URLs to collect. - 1
 
         Returns:
             A list of ranked URLs.
@@ -182,6 +170,7 @@ class CollectLinks(Action):
         prompt = COLLECT_AND_RANKURLS_PROMPT.format(topic=topic, query=query, results=_results)
         logger.debug(prompt)
         indices = await self._aask(prompt)
+
         try:
             indices = OutputParser.extract_struct(indices, list)
             assert all(isinstance(i, int) for i in indices)
@@ -236,7 +225,8 @@ class WebBrowseAndSummarize(Action):
 
         summaries = {}
         prompt_template = WEB_BROWSE_AND_SUMMARIZE_PROMPT.format(query=query, content="{}")
-        for u, content in zip([url, *urls], contents):
+
+        async def process_content(url, content):
             content = content.inner_text
             chunk_summaries = []
             for prompt in generate_prompt_chunk(
@@ -249,17 +239,22 @@ class WebBrowseAndSummarize(Action):
                 chunk_summaries.append(summary)
 
             if not chunk_summaries:
-                summaries[u] = None
-                continue
+                summaries[url] = None
+                return
 
             if len(chunk_summaries) == 1:
-                summaries[u] = chunk_summaries[0]
-                continue
+                summaries[url] = chunk_summaries[0]
+                return
 
             content = "\n".join(chunk_summaries)
             prompt = WEB_BROWSE_AND_SUMMARIZE_PROMPT.format(query=query, content=content)
             summary = await self._aask(prompt, [system_text])
-            summaries[u] = summary
+            summaries[url] = summary
+
+        tasks = []
+        for u, content in zip([url, *urls], contents):
+            tasks.append(process_content(u, content))
+        await asyncio.gather(*tasks)
         return summaries
 
 
@@ -290,6 +285,7 @@ class ConductResearch(Action):
         prompt = CONDUCT_RESEARCH_PROMPT.format(topic=topic, content=content)
         logger.debug(prompt)
         self.llm.auto_max_tokens = True
+        await asyncio.sleep(0.5)  # For safe writing
         return await self._aask(prompt, [system_text])
 
 

@@ -6,7 +6,7 @@ from metagpt.roles.researcher import RESEARCH_PATH, Researcher
 
 
 async def main():
-    topic = "Search the internet for data and reports on current market trends, consumer perceptions, competitive landscape, and more for gel type toothpaste"
+    topic = "Gather reactions and feedback about gel type acne patch on social media, forums, and review sites."
     role = Researcher(language="eng")
     await role.run(topic)
     print(f"save report to {RESEARCH_PATH / f'{topic}.md'}.")
