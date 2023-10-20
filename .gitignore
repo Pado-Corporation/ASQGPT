@@ -9,6 +9,8 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+Multimodal_GPT/
+logs/
 config/
 .Python
 build/

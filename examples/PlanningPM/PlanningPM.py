@@ -7,11 +7,59 @@ import re
 import asyncio
 
 import fire
-
+import json
 from metagpt.actions import Action
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.logs import logger
+
+
+class AssignActionItems(Action):
+    PROMPT_TEMPLATE = """
+    ## Action Items
+    {context}
+
+    Assign the following action items to the appropriate agents. We have the following types of agents.
+    ## Agents type 
+    Researcher : Gather information from the internet and make a summarization report.
+    Searcher : Gather information data from a internal documentation and make a summarization report.
+    MVPMaker : If you need to make a product, it can make Software MVP.
+    Designer : If it needs design, It will generate design satisfying your needs.
+    Analyzer : from the gathered data, do stastical analysis.
+    Ideabank : If the action item is difficult to solve with only the agent above, use an idea and solve the action item indirectly.
+    ----------------
+
+    Return ```python your_code_here ``` with NO other texts.  in json form
+
+
+    ## Example 
+    ```python
+        "task" : "Search the internet for data and reports on current market trends, consumer perceptions, competitive landscape, and more for green products.", 
+        "type": "Researcher"
+        ...
+
+
+    ```
+    constraint : 
+    1. You should only choose among the agents that I suggested. Never make it up.
+
+    """
+
+    def __init__(self, name="AssignActionItems", context=None, llm=None):
+        super().__init__(name, context, llm)
+
+    async def run(self, context: str):
+        prompt = self.PROMPT_TEMPLATE.format(context=context)
+        rsp = await self._aask(prompt)
+        assigned = self.parse_code(rsp)
+        return assigned
+
+    def parse_code(self, rsp):
+        pattern = r"```python(.*)```"
+        match = re.search(pattern, rsp, re.DOTALL)
+        content = match.group(1) if match else rsp
+        assigned = json.loads(content)
+        return assigned
 
 
 class CreateTableOfContentsnActionItems(Action):
@@ -20,7 +68,6 @@ class CreateTableOfContentsnActionItems(Action):
     Return ```python your_code_here ``` with NO other texts,
     example: 
     ```python
-    # Table of Contents
     1. Report Overview
         1-1. Purpose and Scope
         1-2. Data and information sources used
@@ -62,6 +109,8 @@ class CreateTableOfContentsnActionItems(Action):
     7. Research on effective marketing channels and platforms
     8. Search for data and tools to analyze the effectiveness and ROI of promotional and advertising campaigns
     ```
+
+
     constraint : 
     1. These action will be actioned by AI, so you all of the action should be able to be actioned by information that is on internet. For example, user interview shouldn't be included because
     it need practical action. but searching review is possbile.
@@ -78,52 +127,75 @@ class CreateTableOfContentsnActionItems(Action):
 
         rsp = await self._aask(prompt)
 
-        table_of_contents, actionitems = CreateTableOfContentsnActionItems.parse_code(rsp)
-
+        table_of_contents, actionitems = self.parse_code(rsp)
         return table_of_contents, actionitems
 
-    @staticmethod
-    def parse_code(rsp):
+    def parse_code(self, rsp):
         pattern = r"```python(.*)```"
         match = re.search(pattern, rsp, re.DOTALL)
         content = match.group(1) if match else rsp
         table_of_contents, actionItems = content.split("# ActionItems")
-        
         return table_of_contents, actionItems
 
-    
 
-
-class SimpleReporter(Role):
+class PlanningPM(Role):
     def __init__(
         self,
         name: str = "Jonas",
-        profile: str = "SimpleReporter",
+        profile: str = "PlanningPM",
+        table_of_contents=None,
+        actionItems=None,
         **kwargs,
     ):
         super().__init__(name, profile, **kwargs)
-        self._init_actions([CreateTableOfContentsnActionItems])
+        self._init_actions([CreateTableOfContentsnActionItems, AssignActionItems])
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: ready to {self._rc.todo}")
         todo = self._rc.todo
 
-        msg = self._rc.memory.get()[-1]  # retrieve the latest memory
+        msg = self._rc.memory.get(k=0)[-1]  # retrieve the latest memory
         context = msg.content
-
         if isinstance(todo, CreateTableOfContentsnActionItems):
-            table_of_contents = await CreateTableOfContentsnActionItems().run(context)
-            msg = Message(content=table_of_contents, role=self.profile, cause_by=todo)
-\
+            table_of_contents, actionItems = await CreateTableOfContentsnActionItems().run(context)
+            logger.info(f"Table Contents : \n{table_of_contents}")
+            self.table_of_contents = table_of_contents
+            logger.info(f"action Items : \n{actionItems}")
+            self.actionItems = actionItems
+            ret = Message(content=actionItems, role=self.profile, cause_by=todo)
 
+        if isinstance(todo, AssignActionItems):
+            assigned = await AssignActionItems().run(context)
+            logger.info("Assigned Results : \n", assigned)
+            ret = Message(content=assigned, role=self.profile, cause_by=todo)
+        self._rc.memory.add(ret)
+        return ret
+
+    async def _think(self) -> None:
+        """Determine the next action to be taken by the role."""
+        if self._rc.todo is None:
+            self._set_state(0)
+            return
+
+        if self._rc.state + 1 < len(self._states):
+            self._set_state(self._rc.state + 1)
+        else:
+            self._rc.todo = None
+
+    async def _react(self) -> Message:
+        while True:
+            await self._think()
+            if self._rc.todo is None:
+                break
+            msg = await self._act()
         return msg
 
 
-def main(msg="Create a report on climate change"):
-    role = SimpleReporter()
-    logger.info(msg)
-    result = asyncio.run(role.run(msg))
-    logger.info(result)
+def main(topic="Create a report on climate change", context=None):
+    role = PlanningPM()
+    logger.info(f"topic: \n {topic}")
+    result = asyncio.run(role.run(topic))
+    return result
 
 
 if __name__ == "__main__":

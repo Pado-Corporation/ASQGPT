@@ -12,6 +12,10 @@ from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.parse_html import WebPage
 import random
+from html import escape
+import pdfplumber
+import os
+import selenium
 
 
 class PlaywrightWrapper:
@@ -49,7 +53,7 @@ class PlaywrightWrapper:
             browser_type = getattr(ap, self.browser_type)
             await self._run_precheck(browser_type)
             browser = await browser_type.launch(**self.launch_kwargs)
-            context = await browser.new_context(**self._context_kwargs)
+            context = await browser.new_context(**self._context_kwargs, accept_downloads=True)
             page = await context.new_page()
             async with page:
                 _scrape = lambda url: self._scrape(page, url)
@@ -58,18 +62,51 @@ class PlaywrightWrapper:
                     return await asyncio.gather(_scrape(url), *(_scrape(i) for i in urls))
                 return await _scrape(url)
 
+    def convert_pdf_to_html(self, pdf_data):
+        html_content = "<html><body>"
+        inner_text = ""
+
+        with pdfplumber.open(BytesIO(pdf_data)) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text()
+                if text:
+                    inner_text += text
+                    html_content += f"<p>{escape(text)}</p>"
+
+        html_content += "</body></html>"
+
+        return html_content, inner_text
+
     async def _scrape(self, page, url, retry_count=0, max_retries=5):
         try:
-            await page.goto(url)
-            await asyncio.sleep(0.3)
-            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            html = await page.content()
-            inner_text = await page.evaluate("() => document.body.innerText")
+            # URL 확장자를 체크
+            _, file_extension = os.path.splitext(url)
+
+            if file_extension == ".pdf":
+                # PDF 다운로드 로직
+                async with page.expect_download() as download_info:
+                    await page.goto(url)
+                    download = await download_info.value
+                    save_path = f"downloads/{download.suggested_filename}"
+                    await download.save_as(save_path)
+                with open(save_path, "rb") as f:
+                    pdf_data = f.read()
+                html, inner_text = self.convert_pdf_to_html(pdf_data)  # 이 함수는 구현이 필요합니다.
+            else:
+                # 일반 웹 페이지 처리 로직
+                await page.goto(url)
+                await asyncio.sleep(0.5 * retry_count)
+                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                html = await page.content()
+                inner_text = await page.evaluate("() => document.body.innerText")
+
             return WebPage(inner_text=inner_text, html=html, url=url)
+
         except Exception as e:
             if retry_count < max_retries:
+                logger.warning(e)
                 logger.warning(f"Page load retry {url}")
-                await asyncio.sleep(random.uniform(0, 2))  # 1초 대기 후 재시도
+                await asyncio.sleep(random.uniform(0, 2))
                 return await self._scrape(page, url, retry_count=retry_count + 1)
             else:
                 logger.error(f"Page load failed {url}")

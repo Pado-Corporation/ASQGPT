@@ -1,2 +1,0 @@
-class AnalyerAgent:
-    pass
