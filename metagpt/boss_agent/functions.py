@@ -1,7 +1,7 @@
 import sys
 
 
-def read_prompt(filename):
+def read_file(filename):
     """
     Reads the file corresponding to the given `filename` in the `prompts` directory.
     :param filename: The name of the file containing the prompt

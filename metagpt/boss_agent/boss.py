@@ -1,28 +1,28 @@
 import os
 import openai
 import sys
-from functions import read_prompt, check_completion
+from functions import read_file, check_completion
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class Boss:
-    def __init__(self, request, model_type="gpt-4"):
+    def __init__(self, model_type="gpt-4"):
         # Reads the boss' prompt.
-        system_content = read_prompt("boss_prompt.md")
+        boss_prompt = read_file("boss_prompt.md")
         # Sets the model that will be powering the boss.
         self.model_type = model_type
         # Initializes the first context to be delivered to the language model.
         self.messages = [
             {
                 "role": "system",
-                "content": system_content
-            },
-            {
-                "role": "user",
-                "content": request
+                "content": boss_prompt
             }
         ]
+
+    def greetings(self):
+        welcome_text = read_file("welcome.txt")
+        print(welcome_text)
 
     def listen(self):
         """
@@ -70,9 +70,9 @@ class Boss:
         The agent has a conversation with the user.
         :return:
         """
-        self.speak()
         self.listen()
         print("---")
+        self.speak()
         self.conversation()
 
     def run(self):
@@ -80,4 +80,5 @@ class Boss:
         The agent starts to have a conversation.
         :return:
         """
+        self.greetings()
         self.conversation()
