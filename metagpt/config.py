@@ -88,9 +88,13 @@ class Config(metaclass=Singleton):
         self.model_for_researcher_summary = self._get("MODEL_FOR_RESEARCHER_SUMMARY")
         self.model_for_researcher_report = self._get("MODEL_FOR_RESEARCHER_REPORT")
         self.model_for_researcher_keyword = self._get("MODEL_FOR_RESEARCHER_KEYWORD")
+        self.model_for_researcher_rank = self._get("MODEL_FOR_RESEARCHER_RANK")
         self.mermaid_engine = self._get("MERMAID_ENGINE", "nodejs")
         self.pyppeteer_executable_path = self._get("PYPPETEER_EXECUTABLE_PATH", "")
-
+        self.db_addr = self._get("DB_ADDR")
+        self.db_user = self._get("DB_USER")
+        self.db_password = self._get("DB_PASSWORD")
+        self.db_port = self._get("DB_PORT")
         self.prompt_format = self._get("PROMPT_FORMAT", "markdown")
 
     def _init_with_config_files_and_env(self, configs: dict, yaml_file):

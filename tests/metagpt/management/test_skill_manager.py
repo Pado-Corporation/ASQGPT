@@ -15,22 +15,27 @@ def test_skill_manager():
     logger.info(manager._store)
 
     write_prd = WritePRD("WritePRD")
-    write_prd.desc = "基于老板或其他人的需求进行PRD的撰写，包括用户故事、需求分解等"
+    write_prd.desc = "Write PRD based on user needs"
     write_test = WriteTest("WriteTest")
-    write_test.desc = "进行测试用例的撰写"
+    write_test.desc = "Write Test based on project"
     manager.add_skill(write_prd)
     manager.add_skill(write_test)
 
     skill = manager.get_skill("WriteTest")
     logger.info(skill)
 
-    rsp = manager.retrieve_skill("写PRD")
+    rsp = manager.retrieve_skill("Write PRD")
     logger.info(rsp)
     assert rsp[0] == "WritePRD"
 
-    rsp = manager.retrieve_skill("写测试用例")
+    rsp = manager.retrieve_skill("Write Testcase")
     logger.info(rsp)
-    assert rsp[0] == 'WriteTest'
+    assert rsp[0] == "WriteTest"
 
-    rsp = manager.retrieve_skill_scored("写PRD")
+    rsp = manager.retrieve_skill_scored("Write PRD")
     logger.info(rsp)
+
+
+if __name__ == "__main__":
+    manager = SkillManager()
+    manager.generate_skill_desc(Action())

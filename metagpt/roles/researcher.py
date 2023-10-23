@@ -2,21 +2,15 @@
 
 import asyncio
 
-from pydantic import BaseModel
 
-from metagpt.actions import CollectLinks, ConductResearch, WebBrowseAndSummarize
+from metagpt.actions.research import GetQueries, RankLinks, ConductResearch, WebBrowseAndSummarize
 from metagpt.actions.research import get_research_system_text
 from metagpt.const import RESEARCH_PATH
 from metagpt.logs import logger
 from metagpt.roles import Role
-from metagpt.schema import Message
-
-
-class Report(BaseModel):
-    topic: str
-    links: dict[str, list[str]] = None
-    summaries: list[tuple[str, str]] = None
-    content: str = ""
+from metagpt.schema import Message, Report
+from metagpt.remoteDB.reportdb import DBReport
+from metagpt.remoteDB import SESSION
 
 
 class Researcher(Role):
@@ -30,7 +24,9 @@ class Researcher(Role):
         **kwargs,
     ):
         super().__init__(name, profile, goal, constraints, **kwargs)
-        self._init_actions([CollectLinks(name), WebBrowseAndSummarize(name), ConductResearch(name)])
+        self._init_actions(
+            [GetQueries(name), RankLinks(name), WebBrowseAndSummarize(name), ConductResearch(name)]
+        )
         self.language = language
         if language not in ("en-us", "zh-cn"):
             logger.warning(f"The language `{language}` has not been tested, it may not work.")
@@ -58,11 +54,29 @@ class Researcher(Role):
             topic = msg.content
 
         research_system_text = get_research_system_text(topic, self.language)
-        if isinstance(todo, CollectLinks):
-            links = await todo.run(topic, 5, 5)
+        if isinstance(todo, GetQueries):
+            queries = await todo.run(topic, 5)
+            report = Report(
+                topic=topic, queries=queries, write_by=self._agent_id, report_type="GetQueries"
+            )
             ret = Message(
-                "", Report(topic=topic, links=links), role=self.profile, cause_by=type(todo)
+                "",
+                report,
+                role=self.profile,
+                cause_by=type(todo),
             )  # Message의 instruct_content에 Report type을 넣는다. topic을 계속해서 같은걸로 유지한다.
+        elif isinstance(todo, RankLinks):
+            queries = instruct_content.queries
+            links = await todo.run(topic, queries, 5)
+            report = Report(
+                topic=topic, links=links, write_by=self._agent_id, report_type="RankLinks"
+            )
+            ret = Message(
+                "",
+                report,
+                role=self.profile,
+                cause_by=type(todo),
+            )
         elif isinstance(todo, WebBrowseAndSummarize):
             links = instruct_content.links
             todos = (
@@ -73,8 +87,17 @@ class Researcher(Role):
             summaries = list(
                 (url, summary) for i in summaries for (url, summary) in i.items() if summary
             )
+            report = Report(
+                topic=topic,
+                summaries=summaries,
+                write_by=self._agent_id,
+                report_type="WebBrowseAndSummarize",
+            )
             ret = Message(
-                "", Report(topic=topic, summaries=summaries), role=self.profile, cause_by=type(todo)
+                "",
+                report,
+                role=self.profile,
+                cause_by=type(todo),
             )
         else:
             summaries = instruct_content.summaries
@@ -82,13 +105,22 @@ class Researcher(Role):
                 f"url: {url}\nsummary: {summary}" for (url, summary) in summaries
             )
             content = await self._rc.todo.run(topic, summary_text, system_text=research_system_text)
+            report = Report(
+                topic=topic,
+                content=content,
+                write_by=self._agent_id,
+                report_type="ConductResearch",
+            )
             ret = Message(
                 "",
-                Report(topic=topic, content=content),
+                report,
                 role=self.profile,
                 cause_by=type(self._rc.todo),
             )
         self._rc.memory.add(ret)
+        db_report = DBReport(**report.dict())
+        SESSION.add(db_report)
+        SESSION.commit()
         return ret
 
     async def _react(self) -> Message:

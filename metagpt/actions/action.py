@@ -52,8 +52,8 @@ class Action(ABC):
         for i in range(20):
             try:
                 return await self.llm.aask(prompt, system_msgs)  # 성공하면 루프를 나갑니다.
-            except:
-                print("서버가 과부하 상태이거나 준비되지 않았습니다. 재시도합니다.")
+            except Exception as e:
+                logger.warning(f"서버에 문제가 있어 다시 시도합니다 {e}")
                 await asyncio.sleep(random.uniform(0, 1))  # 0~1초 사이를 랜덤으로 기다립니다.
         raise EOFError
 

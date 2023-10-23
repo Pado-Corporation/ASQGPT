@@ -14,11 +14,10 @@ from metagpt.logs import logger
 from metagpt.tools.search_engine import SearchEngine
 from metagpt.tools.web_browser_engine import WebBrowserEngine, WebBrowserEngineType
 from metagpt.utils.common import OutputParser
-from metagpt.utils.text import generate_prompt_chunk, reduce_message_length
-from openai.error import ServiceUnavailableError
-import random
+from metagpt.utils.text import generate_prompt_chunk
 
-LANG_PROMPT = "Please respond in {language}."
+
+LANG_PROMPT = "please respond in {language}"
 
 RESEARCH_BASE_SYSTEM = """You are an AI critical thinker research assistant. Your sole purpose is to write well \
 written, critically acclaimed, objective and structured reports on the given text."""
@@ -28,21 +27,24 @@ RESEARCH_TOPIC_SYSTEM = "You are an AI researcher assistant, and your research t
 SEARCH_TOPIC_PROMPT = """Please provide just upto {keyword_num} important keyword related to your research topic for Google search. \
 You should imagine like human and make a keyword like human. find most nice keyword that is most efficient to find ideal result.
 Your response must be in JSON format, for example: ["keyword1",...].
-### Requirements : Remember you should give upto {keyword_num} keyword
+### Requirements : 
+
+1. Remember you should give upto {keyword_num} keyword
+2. you don't have to respond in only english, please show me mix of korean and english.
 """
 
-SUMMARIZE_SEARCH_PROMPT = """
-### Requirements
+# SUMMARIZE_SEARCH_PROMPT = """
+# ### Requirements
 
-1. The keywords related to your research topic and the search results are shown in the "Search Result Information" section.
-2. Provide up to {decomposition_nums} queries related to your research topic base on the search results.
-3. Please respond in the following JSON format: ["query1", "query2", "query3", ...].
-4. mix it korean version and english version.
-5. It's a good idea to pick keywords that are meaningful in order to *gather as much information as possible* to achieve your topic.
+# 1. The keywords related to your research topic and the search results are shown in the "Search Result Information" section.
+# 2. Provide up to {decomposition_nums} queries related to your research topic base on the search results.
+# 3. Please respond in the following JSON format: ["query1", "query2", "query3", ...].
+# 4. you don't have to respond in english. show me result mix of korean version and english version.
+# 5. It's a good idea to pick keywords that are meaningful in order to *gather as much information as possible* to achieve your topic.
 
-### Search Result Information
-{search_results}
-"""
+# ### Search Result Information
+# {search_results}
+# """
 
 COLLECT_AND_RANKURLS_PROMPT = """
 Your role is ranking every url based on relevancy between query and result snippet
@@ -92,7 +94,7 @@ above. The report must meet the following requirements:
 """
 
 
-class CollectLinks(Action):
+class GetQueries(Action):
     """Action class to collect links from a search engine."""
 
     # 얘는 기본적으로 GPT4 이용
@@ -104,18 +106,17 @@ class CollectLinks(Action):
         **kwargs,
     ):
         super().__init__(name, *args, **kwargs)
-        self.desc = "Collect links from a search engine."
+        self.desc = "Make Proper Query from problem."
         self.search_engine = SearchEngine()
         self.rank_func = rank_func
         if CONFIG.model_for_researcher_keyword:
             self.llm.model = CONFIG.model_for_researcher_keyword
-        logger.log("DEVELOP", "research llm model is " + self.llm.model)
+        logger.log("DEVELOP", "keyword llm model is " + self.llm.model)
 
     async def run(
         self,
         topic: str,
         keyword_num: int = 4,
-        url_per_query: int = 4,
         system_text: str | None = None,
     ) -> dict[str, list[str]]:
         """Run the action to collect links.
@@ -141,6 +142,46 @@ class CollectLinks(Action):
                 f'fail to get keywords related to the research topic "{topic}" for {e}'
             )
             queries = [topic]
+
+        return queries
+
+
+class RankLinks(Action):
+    """Action class to collect links from a search engine."""
+
+    # 얘는 기본적으로 GPT4 이용
+    def __init__(
+        self,
+        name: str = "",
+        *args,
+        rank_func: Callable[[list[str]], None] | None = None,
+        **kwargs,
+    ):
+        super().__init__(name, *args, **kwargs)
+        self.desc = "Do Query and get links and rank it."
+        self.search_engine = SearchEngine()
+        self.rank_func = rank_func
+        if CONFIG.model_for_researcher_rank:
+            self.llm.model = CONFIG.model_for_researcher_rank
+        logger.log("DEVELOP", "rank llm model is " + self.llm.model)
+
+    async def run(
+        self,
+        topic: str,
+        queries: list,
+        url_per_query: int = 4,
+    ) -> dict[str, list[str]]:
+        """Run the action to rank links.
+
+        Args:
+            topic: The research topic.
+            queries: Want to Query and Rank result links
+            url_per_query: The number of URLs to collect per search question.
+            system_text: The system text.
+
+        Returns:
+            A dictionary containing the search questions as keys and the collected URLs as values.
+        """
         ret = {}
         tasks = []
         for query in queries:

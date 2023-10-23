@@ -18,6 +18,7 @@ from metagpt.llm import LLM
 from metagpt.logs import logger
 from metagpt.memory import Memory, LongTermMemory
 from metagpt.schema import Message
+import uuid
 
 PREFIX_TEMPLATE = """You are a {profile}, named {name}, your goal is {goal}, and the constraint is {constraints}. """
 
@@ -66,7 +67,7 @@ class RoleSetting(BaseModel):
 class RoleContext(BaseModel):
     """Role Runtime Context"""
 
-    env: "Environment" = Field(default=None)
+    env: "Environment" = Field(default=None)  # 얘는 한번 호출되면 안바뀌는데 여기있는게 맞나...?
     memory: Memory = Field(default_factory=Memory)
     long_term_memory: LongTermMemory = Field(default_factory=LongTermMemory)
     state: int = Field(default=0)
@@ -104,6 +105,7 @@ class Role:
         )
         self._states = []
         self._actions = []
+        self._agent_id = str(uuid.uuid4())
         self._role_id = str(self._setting)
         self._rc = RoleContext()
 

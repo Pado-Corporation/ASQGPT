@@ -43,8 +43,8 @@ class SearchEngine:
 
     def __init__(
         self,
-            engine: Optional[SearchEngineType] = None,
-            run_func: Callable[[str, int, bool], Coroutine[None, None, Union[str, list[str]]]] = None,
+        engine: Optional[SearchEngineType] = None,
+        run_func: Callable[[str, int, bool], Coroutine[None, None, Union[str, list[str]]]] = None,
     ):
         engine = engine or CONFIG.search_engine
         if engine == SearchEngineType.SERPAPI_GOOGLE:
@@ -84,7 +84,9 @@ class SearchEngine:
     ) -> list[dict[str, str]]:
         ...
 
-    async def run(self, query: str, max_results: int = 8, as_string: bool = True) -> Union[str, list[dict[str, str]]]:
+    async def run(
+        self, query: str, max_results: int = 8, as_string: bool = True
+    ) -> Union[str, list[dict[str, str]]]:
         """Run a search query.
 
         Args:

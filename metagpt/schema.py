@@ -11,6 +11,18 @@ from dataclasses import dataclass, field
 from typing import Type, TypedDict
 
 from metagpt.logs import logger
+from pydantic import BaseModel
+import json
+
+
+class Report(BaseModel):
+    topic: str
+    queries: list[str] = None
+    links: dict[str, list[str]] = None
+    summaries: list[tuple[str, str]] = None
+    content: str = ""
+    write_by: str
+    report_type: str
 
 
 @dataclass
