@@ -7,7 +7,6 @@ from metagpt.remoteDB import init_db
 
 
 async def main():
-    init_db()
     topic = "Search the trend of acne patch for to do market research"
     role = Researcher(language="eng")
     await role.run(topic)

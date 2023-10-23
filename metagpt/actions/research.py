@@ -59,7 +59,8 @@ Your role is ranking every url based on relevancy between query and result snipp
 - No explanation needed. Only give me result list. like your output only inlcude like [0,1,2,3,...]
 """
 
-WEB_BROWSE_AND_SUMMARIZE_PROMPT = """### Requirements
+WEB_BROWSE_AND_SUMMARIZE_PROMPT = """
+### Requirements
 1. Utilize the text in the "Reference Information" section to respond to the question "{query}".
 2. If the question cannot be directly answered using the text, but the text is related to the research topic, please provide \
 a comprehensive summary of the text.

@@ -131,7 +131,7 @@ class Researcher(Role):
             msg = await self._act()
         report = msg.instruct_content
         self.write_report(report.topic, report.content)
-        return msg
+        return msg.instruct_content.content
 
     def write_report(self, topic: str, content: str):
         if not RESEARCH_PATH.exists():
