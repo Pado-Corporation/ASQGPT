@@ -1,6 +1,7 @@
 import os
 import openai
 import sys
+from functions import read_file, check_completion
 from metagpt.config import CONFIG
 
 
@@ -8,17 +9,23 @@ openai.api_key = CONFIG.openai_api_key
 
 
 class Boss:
-    def __init__(self, request, model_type="gpt-4"):
+    def __init__(self, model_type="gpt-4"):
+        # Reads the boss' prompt.
+        boss_prompt = read_file("boss_prompt.md")
+        # Sets the model that will be powering the boss.
         self.model_type = model_type
-        self.messages = [
-            {
-                "role": "system",
-                "content": "You are a friendly consultant that has a task oriented dialogue with the user. Follow these rules:\n- Find what the user wants to achieve by asking under ten questions.\n- One question must be asked for each step.\n- Filter out irrelevant information regarding the goal.\n- If you find the goal, print it in this format: [GOAL] The user wants to ...\n- If the user does not cooperate with finding the goal, end the conversation and print [GOAL] N/A.",
-            },
-            {"role": "user", "content": request},
-        ]
+        # Initializes the first context to be delivered to the language model.
+        self.messages = [{"role": "system", "content": boss_prompt}]
+
+    def greetings(self):
+        welcome_text = read_file("welcome.txt")
+        print(welcome_text)
 
     def listen(self):
+        """
+        The agent waits and listens to the user's message.
+        :return:
+        """
         try:
             message = input("User: ").strip()
             if not message:
@@ -29,11 +36,12 @@ class Boss:
             print("\nASQ: Good talk! I'll see you later :)")
             sys.exit(1)
 
-    def check_completion(self, message):
-        if "[GOAL]" in message:
-            sys.exit()
-
     def speak(self):
+        """
+        The agent responds to the user's message.
+        :return:
+        """
+        # Receive a chat completion object from the OpenAI API.
         response = openai.ChatCompletion.create(
             model=self.model_type,
             messages=self.messages,
@@ -43,14 +51,26 @@ class Boss:
             presence_penalty=0,
         )
         response_message = response["choices"][0]["message"]
+        # Show the boss' response to the user.
         print(f'ASQ: {response_message["content"]}')
-        self.check_completion(response_message["content"])
+        check_completion("[GOAL]", response_message["content"])
+        # Add the boss' message to the context.
         self.messages.append(response_message)
 
     def conversation(self):
-        self.speak()
+        """
+        The agent has a conversation with the user.
+        :return:
+        """
         self.listen()
+        print("---")
+        self.speak()
         self.conversation()
 
     def run(self):
+        """
+        The agent starts to have a conversation.
+        :return:
+        """
+        self.greetings()
         self.conversation()
