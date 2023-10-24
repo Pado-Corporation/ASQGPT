@@ -3,7 +3,8 @@ from sqlalchemy import Column, String, Integer, JSON
 
 
 class DBReport(DBBASE):
-    __tablename__ = "reports"
+    __tablename__ = "test_reports"
+    workflow_id = Column(Integer)
     report_id = Column(Integer, autoincrement=True, primary_key=True)
     topic = Column(String)
     links = Column(JSON)

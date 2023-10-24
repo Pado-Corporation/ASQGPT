@@ -6,8 +6,9 @@ from metagpt.actions.toolsearch import ToolSelect, QuerySummary
 from metagpt.actions.webresearch import (
     GetQueries,
     RankLinks,
-    ConductResearch,
     WebBrowseAndSummarize,
+    ConductResearch,
+    ReportSummary,
 )
 from metagpt.actions.webresearch import get_research_system_text
 from metagpt.const import RESEARCH_PATH
@@ -30,7 +31,13 @@ class Researcher(Role):
     ):
         super().__init__(name, profile, goal, constraints, **kwargs)
         self._init_actions(
-            [GetQueries(name), RankLinks(name), WebBrowseAndSummarize(name), ConductResearch(name)]
+            [
+                GetQueries(name),
+                RankLinks(name),
+                WebBrowseAndSummarize(name),
+                ConductResearch(name),
+                ReportSummary(name),
+            ]
         )
         self.language = language
         if language not in ("en-us", "zh-cn"):
@@ -104,7 +111,7 @@ class Researcher(Role):
                 role=self.profile,
                 cause_by=type(todo),
             )
-        else:
+        elif isinstance(todo, ConductResearch):
             summaries = instruct_content.summaries
             summary_text = "\n---\n".join(
                 f"url: {url}\nsummary: {summary}" for (url, summary) in summaries
@@ -122,7 +129,24 @@ class Researcher(Role):
                 role=self.profile,
                 cause_by=type(self._rc.todo),
             )
+        elif isinstance(todo, ReportSummary):
+            report = instruct_content.content
+            report_summary = await self._rc.todo.run(report)
+            report = Report(
+                topic=topic,
+                content=report_summary,
+                write_by=self._agent_id,
+                report_type="ReportSummary",
+            )
+            ret = Message(
+                "",
+                report,
+                role=self.profile,
+                cause_by=type(self._rc.todo),
+            )
         self._rc.memory.add(ret)
+        report_dict = report.dict()
+        report_dict["workflow_id"] = 1  # for test
         db_report = DBReport(**report.dict())
         SESSION.add(db_report)
         SESSION.commit()
@@ -135,7 +159,6 @@ class Researcher(Role):
                 break
             msg = await self._act()
         report = msg.instruct_content
-        self.write_report(report.topic, report.content)
         return msg.instruct_content.content
 
     def write_report(self, topic: str, content: str):

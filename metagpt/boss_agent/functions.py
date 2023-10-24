@@ -1,4 +1,5 @@
 import sys
+from metagpt.const import PROJECT_ROOT
 
 
 def read_file(filename):
@@ -8,7 +9,7 @@ def read_file(filename):
     :type filename: str
     :return: The prompt
     """
-    with open(f"./prompts/{filename}", 'r') as file:
+    with open(f"{PROJECT_ROOT}/metagpt/boss_agent/prompts/{filename}", "r") as file:
         return file.read()
 
 
@@ -21,5 +22,4 @@ def check_completion(tag, message):
     :type message: str
     :return:
     """
-    if tag in message:
-        sys.exit()
+    return tag in message

@@ -60,16 +60,19 @@ Your role is ranking every url based on relevancy between query and result snipp
 """
 
 WEB_BROWSE_AND_SUMMARIZE_PROMPT = """
-### Requirements
-1. Utilize the text in the "Reference Information" section to respond to the question "{query}".
-2. If the question cannot be directly answered using the text, but the text is related to the research topic, please provide \
-a comprehensive summary of the text.
-3. If the text is entirely unrelated to the research topic, please reply with a simple text "Not relevant."
-4. Include all relevant factual information, numbers, statistics, etc., if available.
-5. If you can't access, then Just tell me "I can't access link"
+Utilize the text in the "Reference Information" section to respond to the question "{query}".
 
 ### Reference Information
 {content}
+
+### Requirments
+1. If the question cannot be directly answered using the text, but the text is related to the research topic, please provide \
+a comprehensive summary of the text.
+2. If the text is entirely unrelated to the research topic, please reply with a simple text "Not relevant."
+4. Include all relevant factual information, numbers, statistics, etc., if available.
+5. If you can't access, tplease reply with "I can't access link" without any explanation.
+6. Never make it up, if you cannot access, Never give me information. 
+
 """
 
 
@@ -92,6 +95,18 @@ above. The report must meet the following requirements:
 - Remember you should make a report.
 - Make sure to include the link you referenced in, and Put all the links you refer to in the reference part.
 - *Never make it up. Never Make a User review or something, Write everything based on reference information*
+"""
+
+SUMMARY_REPORT_PROMPT = """
+Summarize the Markdown text into a single paragraph,
+
+---- Report ------------
+{report}
+---- Requirments -------
+- Output is Markdown text
+- Paragraph must not exceed 300 words
+- Show references with hyperlinks respectively APA form.
+- You must include Reference link you used.
 """
 
 
@@ -331,6 +346,36 @@ class ConductResearch(Action):
         return await self._aask(prompt, [system_text])
 
 
+class ReportSummary(Action):
+    """Do Summary for"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if CONFIG.model_for_report_summary:
+            self.llm.model = CONFIG.model_for_report_summary
+
+    async def run(
+        self,
+        report: str,
+        system_text: str = RESEARCH_BASE_SYSTEM,
+    ) -> str:
+        """Run the action to conduct research and generate a research report.
+
+        Args:
+            topic: The research topic.
+            content: The content for research.
+            system_text: The system text.
+
+        Returns:
+            The generated research report.
+        """
+        prompt = SUMMARY_REPORT_PROMPT.format(report=report)
+        logger.debug(prompt)
+        self.llm.auto_max_tokens = True
+        await asyncio.sleep(0.5)  # For safe writing
+        return await self._aask(prompt, [system_text])
+
+
 def get_research_system_text(topic: str, language: str):
     """Get the system text for conducting research.
 
@@ -344,3 +389,41 @@ def get_research_system_text(topic: str, language: str):
     return " ".join(
         (RESEARCH_TOPIC_SYSTEM.format(topic=topic), LANG_PROMPT.format(language=language))
     )
+
+
+_example_report = """
+# Research Report: ILM Powered Multi-Agent Systems and AGI
+
+## Introduction
+In recent years, there has been growing interest in the development of Artificial General Intelligence (AGI) systems, which possess the ability to perform any intellectual task that a human being can do. One approach to enhancing the capabilities of AGI systems is through the use of Influence Learning Mechanism (ILM) powered multi-agent systems. This research report aims to explore the concept of ILM powered multi-agent systems and their application in AGI. The report will provide an overview of multi-agent systems, discuss the integration of ILM in AGI, and explore the potential benefits and challenges associated with this approach.
+
+## Multi-Agent Systems
+Multi-agent systems are computerized systems composed of multiple interacting intelligent agents. These systems are capable of solving complex problems that are difficult or impossible for individual agents or monolithic systems to solve. The intelligence of these agents can be based on various approaches, including methodic, functional, procedural approaches, algorithmic search, or reinforcement learning [^1] [^2]. Multi-agent systems can consist of software agents, robots, humans, or human teams, and the agents can be categorized into passive agents (without goals), active agents with simple goals, and cognitive agents capable of complex calculations [^1] [^2]. The agent environments can be virtual, discrete, or continuous [^1] [^2].
+
+## ILM in AGI
+ILM, or Influence Learning Mechanism, is a concept that can be integrated into AGI systems to enhance their learning and adaptation capabilities. The NARS (Non-Axiomatic Reasoning System) framework is an example of an AGI system that incorporates ILM [^13]. In the NARS framework, the control mechanism of the system is not entirely designed by the system's creator but is adjusted and fine-tuned by the system itself based on its experience [^13]. The system's resource allocation and task prioritization are influenced by its emotions and desires, which are appraised based on the system's experience and feedback [^13]. This adaptive behavior allows the system to respond to changing circumstances and achieve its goals efficiently [^13].
+
+The NARS framework also incorporates self-organization, where the system's behavior is not predetermined but is influenced by its experience and feedback [^13]. This self-organization enables the system to adapt to its environment, learn from experience, and achieve its goals effectively [^13]. The NARS framework allows the system to organize its atomic operations into compound operations, avoiding repeated planning or searching [^13]. This recursive self-improvement model aligns with the concept of ILM in AGI [^13].
+
+## Benefits and Challenges
+The integration of ILM in AGI systems offers several potential benefits. By incorporating ILM, AGI systems can enhance their learning and adaptation capabilities, allowing them to respond to changing circumstances and achieve goals more efficiently [^13]. The self-organization aspect of ILM enables AGI systems to adapt to their environment and learn from experience, leading to improved performance and problem-solving abilities [^13]. Additionally, the recursive self-improvement model of ILM can contribute to the development of more sophisticated AGI systems [^13].
+
+However, there are also challenges associated with the integration of ILM in AGI systems. One challenge is the design and implementation of the ILM mechanism itself, as it requires careful consideration of factors such as resource allocation, task prioritization, and emotional appraisal [^13]. Another challenge is the potential for unintended consequences or biases in the learning and adaptation process, which may require additional safeguards and oversight [^13]. Furthermore, the development of AGI systems with ILM requires significant computational resources and expertise, which may pose practical challenges [^13].
+
+## Conclusion
+ILM powered multi-agent systems offer a promising approach to enhancing the capabilities of AGI systems. By integrating ILM, AGI systems can improve their learning and adaptation abilities, leading to more efficient problem-solving and performance. The self-organization aspect of ILM enables AGI systems to adapt to their environment and learn from experience, further enhancing their capabilities. However, the integration of ILM in AGI systems also presents challenges, such as the design and implementation of the ILM mechanism and the potential for unintended consequences or biases. Further research and development are needed to overcome these challenges and fully realize the potential of ILM powered multi-agent systems in AGI.
+
+## References
+[^1]: Wikipedia. (n.d.). Multi-agent system. Retrieved from [https://en.wikipedia.org/wiki/Multi-agent_system](https://en.wikipedia.org/wiki/Multi-agent_system)
+[^2]: Wooldridge, M. (2009). An Introduction to MultiAgent Systems. John Wiley & Sons.
+[^13]: NARS Research Group. (n.d.). Influence Learning Mechanism. Retrieved from [https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7805877/](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7805877/)
+"""
+
+if __name__ == "__main__":
+    import fire
+
+    async def main(topic=_example_report, language="en-us"):
+        report_summary = await ReportSummary().run(_example_report)
+        print(report_summary)
+
+    fire.Fire(main)
