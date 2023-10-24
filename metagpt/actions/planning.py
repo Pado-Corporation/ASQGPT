@@ -19,9 +19,9 @@ class AssignActionItems(Action):
     ## Agents type 
     Researcher : Gather information from the internet and make a summarization report.
     Searcher : Gather information data from a internal documentation and make a summarization report.
-    MVPMaker : If you need to make a product, it can make Software MVP.
-    Designer : If it needs design, It will generate design satisfying your needs.
-    Analyzer : from the gathered data, do stastical analysis. (deprecated)
+    MVPMaker : If you need to make a product, it can make Software MVP. (not used)
+    Designer : If it needs design, It will generate design satisfying your needs. (not used)
+    Analyzer : from the gathered data, do stastical analysis. (not used)
     Ideabank : If the action item is difficult to solve with only the agent above, use an idea and solve the action item indirectly.
     Summarizer : If you need Summarize some of data, then use this agent.
     ----------------
@@ -102,9 +102,8 @@ class CreateTableOfContentsnActionItems(Action):
     3. Researching the internet to analyze prices, features, marketing strategies, etc. of similar products
     4. Gathering information on green-related meetings, events, and seminars
     5. Search for consumer research and reports related to your key target audiences
-    6. Searching for SWOT analysis reports or materials on related industries
+    6. Do SWOT analysis reports or materials on related industries
     7. Research on effective marketing channels and platforms
-    8. Search for data and tools to analyze the effectiveness and ROI of promotional and advertising campaigns
     ```
 
 

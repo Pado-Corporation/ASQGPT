@@ -24,13 +24,13 @@ written, critically acclaimed, objective and structured reports on the given tex
 
 RESEARCH_TOPIC_SYSTEM = "You are an AI researcher assistant, and your research topic is:\n{topic}\n"
 
+
 SEARCH_TOPIC_PROMPT = """Please provide just upto {keyword_num} important keyword related to your research topic for Google search. \
 You should imagine like human and make a keyword like human. find most nice keyword that is most efficient to find ideal result.
 Your response must be in JSON format, for example: ["keyword1",...].
 ### Requirements : 
 
 1. Remember you should give upto {keyword_num} keyword
-2. you don't have to respond in only english, please show me mix of korean and english.
 """
 
 # SUMMARIZE_SEARCH_PROMPT = """
