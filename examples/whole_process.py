@@ -1,5 +1,5 @@
 from metagpt.roles.planningpm import PlanningPM
-from metagpt.boss_agent.boss import Boss
+from metagpt.asq_agents.boss import Boss
 from metagpt.roles.researcher import Researcher
 from metagpt.remoteDB import init_db
 import asyncio
@@ -16,7 +16,7 @@ async def main(request="Create a report on climate change", context=None):
     init_db()
     openai.api_key = CONFIG.openai_api_key
     boss_agent = Boss()
-    goal = boss_agent.run(request)
+    goal = boss_agent.run()
     pm_agent = PlanningPM()
     request.info(f"topic: \n {request}")
     assigned = asyncio.run(pm_agent.run(request))
