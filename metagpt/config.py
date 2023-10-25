@@ -90,6 +90,7 @@ class Config(metaclass=Singleton):
         self.model_for_researcher_keyword = self._get("MODEL_FOR_RESEARCHER_KEYWORD")
         self.model_for_researcher_rank = self._get("MODEL_FOR_RESEARCHER_RANK")
         self.model_for_report_summary = self._get("MODEL_FOR_REPORT_SUMMARY")
+        self.model_for_boss = self._get("MODEL_FOR_BOSS")
         self.mermaid_engine = self._get("MERMAID_ENGINE", "nodejs")
         self.pyppeteer_executable_path = self._get("PYPPETEER_EXECUTABLE_PATH", "")
         self.db_addr = self._get("DB_ADDR")

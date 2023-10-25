@@ -6,13 +6,17 @@ from metagpt.config import CONFIG
 
 
 class Boss:
-    def __init__(self, model_type="gpt-4"):
+    def __init__(self, language="en-us"):
         # Reads the boss' prompt.
         instruction = read_file("boss_prompt.md")
         # Sets the model that will be powering the boss.
-        self.model_type = model_type
+        if CONFIG.model_for_boss:
+            self.model_type = CONFIG.model_for_boss
+        else:
+            self.model_type = "gpt-4"
+        language_instruction = f"Respond in {language}" + instruction
         # Initializes the first context to be delivered to the language model.
-        self.messages = [{"role": "system", "content": instruction}]
+        self.messages = [{"role": "system", "content": language_instruction}]
 
     def greetings(self):
         welcome_text = read_file("welcome.txt")

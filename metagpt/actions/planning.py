@@ -10,6 +10,14 @@ from metagpt.actions import Action
 from metagpt.logs import logger
 
 
+LANG_PROMPT = "please respond in {language}"
+
+PLANNING_BASE_SYSTEM = """You are an AI critical thinker research assistant. Your sole purpose is to write well \
+written, critically acclaimed, objective and structured reports on the given text."""
+
+PLANNING_TOPIC_SYSTEM = "You are an AI researcher assistant, and your research topic is:\n{topic}\n"
+
+
 class AssignActionItems(Action):
     PROMPT_TEMPLATE = """
     ## Action Items
@@ -45,9 +53,9 @@ class AssignActionItems(Action):
     def __init__(self, name="AssignActionItems", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    async def run(self, context: str):
+    async def run(self, context: str, system_text: str):
         prompt = self.PROMPT_TEMPLATE.format(context=context)
-        rsp = await self._aask(prompt)
+        rsp = await self._aask(prompt, [system_text])
         assigned = self.parse_code(rsp)
         return assigned
 
@@ -121,10 +129,10 @@ class CreateTableOfContentsnActionItems(Action):
     def __init__(self, name="CreateTableOfContentsnActionItems", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    async def run(self, context: str):
+    async def run(self, context: str, system_text=PLANNING_BASE_SYSTEM):
         prompt = self.PROMPT_TEMPLATE.format(context=context)
 
-        rsp = await self._aask(prompt)
+        rsp = await self._aask(prompt, [system_text])
 
         table_of_contents, actionitems = self.parse_code(rsp)
         return table_of_contents, actionitems
@@ -135,3 +143,18 @@ class CreateTableOfContentsnActionItems(Action):
         content = match.group(1) if match else rsp
         table_of_contents, actionItems = content.split("# ActionItems")
         return table_of_contents, actionItems
+
+
+def get_planning_system_text(topic: str, language: str):
+    """Get the system text for conducting research.
+
+    Args:
+        topic: The research topic.
+        language: The language for the system text.
+
+    Returns:
+        The system text for conducting research.
+    """
+    return " ".join(
+        (PLANNING_TOPIC_SYSTEM.format(topic=topic), LANG_PROMPT.format(language=language))
+    )

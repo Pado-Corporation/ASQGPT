@@ -67,7 +67,7 @@ class Researcher(Role):
 
         research_system_text = get_research_system_text(topic, self.language)
         if isinstance(todo, GetQueries):
-            queries = await todo.run(topic, 5)
+            queries = await todo.run(topic, keyword_num=5, system_text=research_system_text)
             report = Report(
                 topic=topic, queries=queries, write_by=self._agent_id, report_type="GetQueries"
             )
@@ -79,7 +79,7 @@ class Researcher(Role):
             )  # Message의 instruct_content에 Report type을 넣는다. topic을 계속해서 같은걸로 유지한다.
         elif isinstance(todo, RankLinks):
             queries = instruct_content.queries
-            links = await todo.run(topic, queries, 5)
+            links = await todo.run(topic, queries, url_per_query=3)
             report = Report(
                 topic=topic, links=links, write_by=self._agent_id, report_type="RankLinks"
             )
@@ -147,7 +147,7 @@ class Researcher(Role):
         self._rc.memory.add(ret)
         report_dict = report.dict()
         report_dict["workflow_id"] = 1  # for test
-        db_report = DBReport(**report.dict())
+        db_report = DBReport(report_dict)
         SESSION.add(db_report)
         SESSION.commit()
         return ret

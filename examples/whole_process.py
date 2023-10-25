@@ -20,17 +20,17 @@ The user wants to deliver a structured and effective presentation on ILM powered
 The user's presentation is about ILM powered multi-agent systems and their relation to AGI. The key points to be highlighted are the possibility of AGI, elements of AGI, and companies that are developing AGI. The user does not have a specific structure in mind for the presentation and there are no time constraints. The user needs help with the delivery of the presentation, specifically in making it more structured."""
 
 
-async def main():
+async def main(launguage="en-us"):
     init_db()
     openai.api_key = CONFIG.openai_api_key
-    # boss_agent = Boss()
-    # goalncontext = boss_agent.run()
-    pm_agent = PlanningPM()
-    logger.info(f"{pass_boss}")
-    assigned = await pm_agent.run(pass_boss)
+    boss_agent = Boss(language="kor")
+    goalncontext = boss_agent.run()
+    pm_agent = PlanningPM(language="kor")
+    logger.info(f"{goalncontext}")
+    assigned = await pm_agent.run(goalncontext)
     for assign in assigned.content:
         if assign["type"] == "Researcher":
-            role = Researcher(language="eng")
+            role = Researcher(language="kor")
             report_summary = await role.run(assign["task"])
             logger.info(f"Report Summary: {report_summary}")
 

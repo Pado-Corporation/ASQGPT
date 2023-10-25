@@ -6,6 +6,7 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.logs import logger
 from metagpt.actions.planning import CreateTableOfContentsnActionItems, AssignActionItems
+from metagpt.actions.planning import get_planning_system_text
 
 
 class PlanningPM(Role):
@@ -13,12 +14,12 @@ class PlanningPM(Role):
         self,
         name: str = "Jonas",
         profile: str = "PlanningPM",
-        table_of_contents=None,
-        actionItems=None,
+        language: str = "en-us",
         **kwargs,
     ):
         super().__init__(name, profile, **kwargs)
-        self._init_actions([CreateTableOfContentsnActionItems, AssignActionItems])
+        self._init_actions([CreateTableOfContentsnActionItems(name), AssignActionItems(name)])
+        self.language = language
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: ready to {self._rc.todo}")
@@ -26,8 +27,9 @@ class PlanningPM(Role):
 
         msg = self._rc.memory.get(k=0)[-1]  # retrieve the latest memory
         context = msg.content
+        planning_system_text = get_planning_system_text(context, language=self.language)
         if isinstance(todo, CreateTableOfContentsnActionItems):
-            table_of_contents, actionItems = await CreateTableOfContentsnActionItems().run(context)
+            table_of_contents, actionItems = await todo.run(context, planning_system_text)
             logger.info(f"Table Contents : \n{table_of_contents}")
             self.table_of_contents = table_of_contents
             logger.info(f"action Items : \n{actionItems}")
@@ -35,7 +37,7 @@ class PlanningPM(Role):
             ret = Message(content=actionItems, role=self.profile, cause_by=todo)
 
         if isinstance(todo, AssignActionItems):
-            assigned = await AssignActionItems().run(context)
+            assigned = await todo.run(context, planning_system_text)
             logger.info("Assigned Results : \n", assigned)
             ret = Message(content=assigned, role=self.profile, cause_by=todo)
         self._rc.memory.add(ret)
