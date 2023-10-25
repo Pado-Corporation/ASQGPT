@@ -57,7 +57,7 @@ your role is summarize information based on problem user want to solve, and cont
 ### Requirements
 - Make report base on user goal and context.
 - Try to include url.
-- Give me your comparision based on goal and context
+- Give me your comparision based on goal and context.
 """
 
 
