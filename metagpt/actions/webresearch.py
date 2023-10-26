@@ -17,7 +17,7 @@ from metagpt.utils.common import OutputParser
 from metagpt.utils.text import generate_prompt_chunk
 
 
-LANG_PROMPT = "please respond in {language}"
+LANG_PROMPT = "please act as {language} people, you consider their culture in your output. must respond in {language}"
 
 RESEARCH_BASE_SYSTEM = """You are an AI critical thinker research assistant. Your sole purpose is to write well \
 written, critically acclaimed, objective and structured reports on the given text."""

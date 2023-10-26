@@ -2,7 +2,7 @@
 
 import asyncio
 
-from metagpt.actions.toolsearch import ToolSelect, QuerySummary
+from metagpt.actions.toolsearch import ToolSelect, ToolUseSummary
 from metagpt.actions.webresearch import (
     GetQueries,
     RankLinks,
@@ -29,16 +29,9 @@ class Researcher(Role):
         language: str = "en-us",
         **kwargs,
     ):
+        self.name = name
         super().__init__(name, profile, goal, constraints, **kwargs)
-        self._init_actions(
-            [
-                GetQueries(name),
-                RankLinks(name),
-                WebBrowseAndSummarize(name),
-                ConductResearch(name),
-                ReportSummary(name),
-            ]
-        )
+        self._init_actions([ToolSelect(name)])
         self.language = language
         if language not in ("en-us", "zh-cn"):
             logger.warning(f"The language `{language}` has not been tested, it may not work.")
@@ -66,7 +59,35 @@ class Researcher(Role):
             topic = msg.content
 
         research_system_text = get_research_system_text(topic, self.language)
-        if isinstance(todo, GetQueries):
+        if isinstance(todo, ToolSelect):
+            selected_tools = await todo.run(topic)
+            logger.info(f"Toolselected: {selected_tool}")
+            for selected_tool in selected_tools:
+                if selected_tool == "WEBSEARCH":
+                    self._add_actions[
+                        GetQueries(self.name),
+                        RankLinks(self.name),
+                        WebBrowseAndSummarize(self.name),
+                        ConductResearch(self.name),
+                        ReportSummary(self.name),
+                    ]
+                else:
+                    self._add_actions[ToolUseSummary(tool_type=selected_tool)]
+        elif isinstance(todo, ToolUseSummary):
+            ToolSummary = await todo.run(topic, 5, system_text=research_system_text)
+            report = Report(
+                topic=topic,
+                content=ToolSummary,
+                write_by=self._agent_id,
+                report_type="ToolUseSummary",
+            )
+            ret = Message(
+                "",
+                report,
+                role=self.profile,
+                cause_by=type(todo),
+            )
+        elif isinstance(todo, GetQueries):
             queries = await todo.run(topic, keyword_num=5, system_text=research_system_text)
             report = Report(
                 topic=topic, queries=queries, write_by=self._agent_id, report_type="GetQueries"
@@ -147,7 +168,7 @@ class Researcher(Role):
         self._rc.memory.add(ret)
         report_dict = report.dict()
         report_dict["workflow_id"] = 1  # for test
-        db_report = DBReport(report_dict)
+        db_report = DBReport(**report_dict)
         SESSION.add(db_report)
         SESSION.commit()
         return ret

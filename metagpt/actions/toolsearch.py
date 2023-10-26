@@ -8,14 +8,13 @@ from pydantic import parse_obj_as
 from metagpt.actions import Action
 from metagpt.config import CONFIG
 from metagpt.logs import logger
-from metagpt.tools.search_engine import SearchEngine
 from metagpt.tools.web_browser_engine import WebBrowserEngine, WebBrowserEngineType
 from metagpt.utils.common import OutputParser
 from metagpt.utils.text import generate_prompt_chunk
 from metagpt.tools.current_researchtool import CURRENT_RESEARCHTOOL, get_tooldescription
 import aiohttp
 
-LANG_PROMPT = "please respond in {language}"
+LANG_PROMPT = "please act as {language} people, you must respond in {language}"
 
 RESEARCH_BASE_SYSTEM = """You are an AI critical thinker research assistant. Your sole purpose is to write well \
 written, critically acclaimed, objective and structured reports on the given text."""
@@ -257,7 +256,7 @@ class ToolUseSummary(Action):
         logger.info(output)
         return output
 
-    async def run(self, problem: str, research_num: int):
+    async def run(self, problem: str, research_num: int, system_text: str):
         self.problem = problem
         api_query = await self.toolsetting(problem)
         try:
@@ -306,7 +305,7 @@ class ToolUseSummary(Action):
                 reference=str(useful_infos), problem=problem
             )
 
-        summary_report = await self.llm.aask(final_summary_prompt)
+        summary_report = await self.llm.aask(final_summary_prompt, [system_text])
         return summary_report
 
 

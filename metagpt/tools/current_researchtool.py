@@ -62,7 +62,10 @@ CURRENT_RESEARCHTOOL = [
         "tool": "Google Event API",
         "WhenToUse": "When looking for information on public events or calendars",
     },
-    {"tool": "Websearch", "WhenToUse": "General information gathering"},
+    {
+        "tool": "WEBSEARCH",
+        "WhenToUse": "General information gathering by crawling. Use it in necessary situation",
+    },
 ]
 
 
