@@ -15,7 +15,7 @@ import random
 from html import escape
 import pdfplumber
 import os
-import selenium
+from io import BytesIO
 
 
 class PlaywrightWrapper:
