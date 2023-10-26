@@ -22,12 +22,12 @@ class AssignActionItems(Action):
     Assign the following action items to the appropriate agents. We have the following types of agents.
     ## Agents type 
     Researcher : Gather information from the internet and make a summarization report.
-    Searcher : Gather information data from a internal documentation and make a summarization report.
-    MVPMaker : If you need to make a product, it can make Software MVP.
-    Designer : If it needs design, It will generate design satisfying your needs.
-    Analyzer : from the gathered data, do stastical analysis. (deprecated)
-    Ideabank : If the action item is difficult to solve with only the agent above, use an idea and solve the action item indirectly.
-    Summarizer : If you need Summarize some of data, then use this agent.
+    Searcher : Gather information data from a internal documentation and make a summarization report. (Depreciated)
+    MVPMaker : If you need to make a product, it can make Software MVP. (Depreciated)
+    Designer : If it needs design, It will generate design satisfying your needs. (Depreciated)
+    Analyzer : from the gathered data, do stastical analysis. 
+    Ideabank : If the action item is difficult to solve with only the agent above, use an idea and solve the action item indirectly. (Depreciated)
+    Summarizer : If you need Summarize some of data, then use this agent. 
     ----------------
 
     Return ```python your_code_here ``` with NO other texts.  in json form

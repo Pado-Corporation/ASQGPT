@@ -5,7 +5,7 @@ import asyncio
 import sys
 from pathlib import Path
 from typing import Literal
-
+import traceback
 from playwright.async_api import async_playwright
 
 from metagpt.config import CONFIG
@@ -16,6 +16,7 @@ from html import escape
 import pdfplumber
 import os
 from io import BytesIO
+import requests
 
 
 class PlaywrightWrapper:
@@ -37,6 +38,7 @@ class PlaywrightWrapper:
             browser_type = CONFIG.playwright_browser_type
         self.browser_type = browser_type
         launch_kwargs = launch_kwargs or {}
+        # launch_kwargs["headless"] = False
         if CONFIG.global_proxy and "proxy" not in launch_kwargs:
             args = launch_kwargs.get("args", [])
             if not any(str.startswith(i, "--proxy-server=") for i in args):
@@ -60,7 +62,9 @@ class PlaywrightWrapper:
 
                 if urls:
                     return await asyncio.gather(_scrape(url), *(_scrape(i) for i in urls))
-                return await _scrape(url)
+            output = await _scrape(url)
+            await browser.close()
+        return output
 
     def convert_pdf_to_html(self, pdf_data):
         html_content = "<html><body>"
@@ -79,33 +83,38 @@ class PlaywrightWrapper:
 
     async def _scrape(self, page, url, retry_count=0, max_retries=5):
         try:
-            # URL 확장자를 체크
             _, file_extension = os.path.splitext(url)
-
             if file_extension == ".pdf":
                 # PDF 다운로드 로직
-                async with page.expect_download() as download_info:
-                    await page.goto(url)
-                    download = await download_info.value
-                    save_path = f"downloads/{download.suggested_filename}"
-                    await download.save_as(save_path)
+                response = requests.get(url)
+                save_path = "temporal download" + str(random.uniform(0, 10))
+                if response.status_code == 200:
+                    with open(save_path, "wb") as f:
+                        f.write(response.content)
+                else:
+                    print(f"Failed to download PDF: {response.status_code}")
                 with open(save_path, "rb") as f:
                     pdf_data = f.read()
-                html, inner_text = self.convert_pdf_to_html(pdf_data)  # 이 함수는 구현이 필요합니다.
+                html, inner_text = self.convert_pdf_to_html(pdf_data)
+                os.remove(save_path)
             else:
+                response = await page.goto(url)
+                final_url = response.url
+                if url != final_url:
+                    logger.info(f"Redirect detected. Original URL: {url}, Final URL: {final_url}")
+                    url = final_url
                 # 일반 웹 페이지 처리 로직
                 await page.goto(url)
                 await asyncio.sleep(0.5 * retry_count)
                 await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                 html = await page.content()
                 inner_text = await page.evaluate("() => document.body.innerText")
-
             return WebPage(inner_text=inner_text, html=html, url=url)
 
         except Exception as e:
             if retry_count < max_retries:
-                logger.warning(e)
-                logger.warning(f"Page load retry {url}")
+                logger.warning(f"Page load retry {url} by {e}")
+                traceback.print_exc()
                 await asyncio.sleep(random.uniform(0, 2))
                 return await self._scrape(page, url, retry_count=retry_count + 1)
             else:

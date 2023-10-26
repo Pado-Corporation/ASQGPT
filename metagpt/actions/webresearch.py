@@ -69,6 +69,7 @@ Utilize the text in the "Reference Information" section to respond to the questi
 1. If the question cannot be directly answered using the text, but the text is related to the research topic, please provide \
 a comprehensive summary of the text.
 2. If the text is entirely unrelated to the research topic, please reply with a simple text "Not relevant."
+3. Try to Include where these data come from. 
 4. Include all relevant factual information, numbers, statistics, etc., if available.
 5. If you can't access, tplease reply with "I can't access link" without any explanation.
 6. Never make it up, if you cannot access, Never give me information. 
@@ -753,9 +754,9 @@ if __name__ == "__main__":
     import fire
 
     async def main():
-        report = await ConductResearch().run(
-            topic="Find scholarly articles and research papers on AGI to understand its elements and possibilities.",
-            content=__example_websummaies,
+        report = await WebBrowseAndSummarize().run(
+            url="https://invest.kiwoom.com/inv/resource/202309/UploadFile_20230915103535000748.pdf",
+            query="Summarize SamSung company report",
         )
         print(report)
 
