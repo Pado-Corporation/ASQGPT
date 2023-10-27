@@ -9,8 +9,9 @@ from metagpt.tools import WebBrowserEngineType, web_browser_engine
     [
         (WebBrowserEngineType.PLAYWRIGHT, "https://fuzhi.ai", ("https://fuzhi.ai",)),
         (WebBrowserEngineType.SELENIUM, "https://fuzhi.ai", ("https://fuzhi.ai",)),
+        (WebBrowserEngineType.PLAYWRIGHT, "https://sma.org/ai-in-medical-diagnosis/", None),
     ],
-    ids=["playwright", "selenium"],
+    ids=["playwright", "selenium", "mysite"],
 )
 async def test_scrape_web_page(browser_type, url, urls):
     browser = web_browser_engine.WebBrowserEngine(browser_type)

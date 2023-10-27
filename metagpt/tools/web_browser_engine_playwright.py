@@ -62,9 +62,7 @@ class PlaywrightWrapper:
 
                 if urls:
                     return await asyncio.gather(_scrape(url), *(_scrape(i) for i in urls))
-            output = await _scrape(url)
-            await browser.close()
-        return output
+                return await _scrape(url)
 
     def convert_pdf_to_html(self, pdf_data):
         html_content = "<html><body>"

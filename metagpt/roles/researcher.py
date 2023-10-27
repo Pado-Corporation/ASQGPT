@@ -58,25 +58,29 @@ class Researcher(Role):
         else:
             topic = msg.content
             query = msg.instruct_content
-
+        ret = None
         research_system_text = get_research_system_text(topic, self.language)
         if isinstance(todo, ToolSelect):
             selected_tools = await todo.run(topic, system_text=research_system_text)
-            logger.info(f"Toolselected: {selected_tool}")
+            logger.info(f"Toolselected: {selected_tools}")
             for selected_tool in selected_tools:
                 if selected_tool == "WEBSEARCH":
-                    self._add_actions[
-                        GetQueries(self.name),
-                        RankLinks(self.name),
-                        WebBrowseAndSummarize(self.name),
-                        ConductResearch(self.name),
-                        ReportSummary(self.name),
-                    ]
+                    self._add_actions(
+                        [
+                            GetQueries(self.name),
+                            RankLinks(self.name),
+                            WebBrowseAndSummarize(self.name),
+                            ConductResearch(self.name),
+                            ReportSummary(self.name),
+                        ]
+                    )
                 else:
-                    self._add_actions[
-                        ToolSetting(tool_type=selected_tool),
-                        ToolUseSummary(tool_type=selected_tool),
-                    ]
+                    self._add_actions(
+                        [
+                            ToolSetting(tool_type=selected_tool),
+                            ToolUseSummary(tool_type=selected_tool),
+                        ]
+                    )
         elif isinstance(todo, ToolSetting):
             problem, toolsetting = await todo.run(topic)
             ret = Message(
@@ -183,7 +187,8 @@ class Researcher(Role):
                 role=self.profile,
                 cause_by=type(self._rc.todo),
             )
-        self._rc.memory.add(ret)
+        if ret is not None:
+            self._rc.memory.add(ret)
         try:
             report_dict = report.dict()
             report_dict["workflow_id"] = 1  # for test
