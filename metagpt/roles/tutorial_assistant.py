@@ -11,12 +11,10 @@ from typing import Dict
 
 from metagpt.actions.write_tutorial import WriteDirectory, WriteContent
 from metagpt.const import TUTORIAL_PATH
-from metagpt.logs import define_log_level_gyutae
+from metagpt.logs import logger
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.utils.file import File
-
-logger = define_log_level_gyutae(logfile_name="tutorial_test")
 
 
 class TutorialAssistant(Role):

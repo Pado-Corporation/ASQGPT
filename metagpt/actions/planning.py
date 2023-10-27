@@ -123,7 +123,7 @@ class CreateTableOfContentsnActionItems(Action):
     3. If you think topic is heavy, then give me diverse actionitems as much as possible.
     4. If you think topic is not heavy, give me simple report and actionitems.
     5. Don't include useless information for purpose in the report.
-
+    6. give me action item as detail as possbile. An action item should be able to be performed without further questions based solely on what is contained in the action item.
     """
 
     def __init__(self, name="CreateTableOfContentsnActionItems", context=None, llm=None):

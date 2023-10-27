@@ -5,7 +5,7 @@ from pathlib import Path
 import wrapt
 import textwrap
 import inspect
-from interpreter.interpreter import Interpreter
+from interpreter import Interpreter
 
 from metagpt.logs import logger
 from metagpt.config import CONFIG
@@ -16,7 +16,7 @@ from metagpt.actions.clone_function import CloneFunction, run_function_code, run
 def extract_python_code(code: str):
     """Extract code blocks: If the code comments are the same, only the last code block is kept."""
     # Use regular expressions to match comment blocks and related code.
-    pattern = r'(#\s[^\n]*)\n(.*?)(?=\n\s*#|$)'
+    pattern = r"(#\s[^\n]*)\n(.*?)(?=\n\s*#|$)"
     matches = re.findall(pattern, code, re.DOTALL)
 
     # Extract the last code block when encountering the same comment.
@@ -25,8 +25,10 @@ def extract_python_code(code: str):
         unique_comments[comment] = code_block
 
     # concatenate into functional form
-    result_code = '\n'.join([f"{comment}\n{code_block}" for comment, code_block in unique_comments.items()])
-    header_code = code[:code.find("#")]
+    result_code = "\n".join(
+        [f"{comment}\n{code_block}" for comment, code_block in unique_comments.items()]
+    )
+    header_code = code[: code.find("#")]
     code = header_code + result_code
 
     logger.info(f"Extract python code: \n {highlight(code)}")
@@ -36,6 +38,7 @@ def extract_python_code(code: str):
 
 class OpenCodeInterpreter(object):
     """https://github.com/KillianLucas/open-interpreter"""
+
     def __init__(self, auto_run: bool = True) -> None:
         interpreter = Interpreter()
         interpreter.auto_run = auto_run
@@ -50,27 +53,39 @@ class OpenCodeInterpreter(object):
         return self.interpreter.chat(query, return_messages=True)
 
     @staticmethod
-    def extract_function(query_respond: List, function_name: str, *, language: str = 'python',
-                         function_format: str = None) -> str:
+    def extract_function(
+        query_respond: List,
+        function_name: str,
+        *,
+        language: str = "python",
+        function_format: str = None,
+    ) -> str:
         """create a function from query_respond."""
-        if language not in ('python'):
+        if language not in ("python"):
             raise NotImplementedError(f"Not support to parse language {language}!")
 
         # set function form
         if function_format is None:
-            assert language == 'python', f"Expect python language for default function_format, but got {language}."
+            assert (
+                language == "python"
+            ), f"Expect python language for default function_format, but got {language}."
             function_format = """def {function_name}():\n{code}"""
         # Extract the code module in the open-interpreter respond message.
-        code = [item['function_call']['parsed_arguments']['code'] for item in query_respond
-                if "function_call" in item
-                and "parsed_arguments" in item["function_call"]
-                and 'language' in item["function_call"]['parsed_arguments']
-                and item["function_call"]['parsed_arguments']['language'] == language]
+        code = [
+            item["function_call"]["parsed_arguments"]["code"]
+            for item in query_respond
+            if "function_call" in item
+            and "parsed_arguments" in item["function_call"]
+            and "language" in item["function_call"]["parsed_arguments"]
+            and item["function_call"]["parsed_arguments"]["language"] == language
+        ]
         # add indent.
-        indented_code_str = textwrap.indent("\n".join(code), ' ' * 4)
+        indented_code_str = textwrap.indent("\n".join(code), " " * 4)
         # Return the code after deduplication.
         if language == "python":
-            return extract_python_code(function_format.format(function_name=function_name, code=indented_code_str))
+            return extract_python_code(
+                function_format.format(function_name=function_name, code=indented_code_str)
+            )
 
 
 def gen_query(func: Callable, args, kwargs) -> str:
@@ -89,7 +104,9 @@ def gen_template_fun(func: Callable) -> str:
 
 
 class OpenInterpreterDecorator(object):
-    def __init__(self, save_code: bool = False, code_file_path: str = None, clear_code: bool = False) -> None:
+    def __init__(
+        self, save_code: bool = False, code_file_path: str = None, clear_code: bool = False
+    ) -> None:
         self.save_code = save_code
         self.code_file_path = code_file_path
         self.clear_code = clear_code
@@ -126,4 +143,5 @@ class OpenInterpreterDecorator(object):
             except Exception as e:
                 raise Exception("Could not evaluate Python code", e)
             return res
+
         return wrapper(wrapped)

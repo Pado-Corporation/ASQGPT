@@ -2,7 +2,7 @@
 
 import asyncio
 
-from metagpt.actions.toolsearch import ToolSelect, ToolUseSummary
+from metagpt.actions.toolsearch import ToolSelect, ToolUseSummary, ToolSetting
 from metagpt.actions.webresearch import (
     GetQueries,
     RankLinks,
@@ -57,10 +57,11 @@ class Researcher(Role):
             topic = instruct_content.topic
         else:
             topic = msg.content
+            query = msg.instruct_content
 
         research_system_text = get_research_system_text(topic, self.language)
         if isinstance(todo, ToolSelect):
-            selected_tools = await todo.run(topic)
+            selected_tools = await todo.run(topic, system_text=research_system_text)
             logger.info(f"Toolselected: {selected_tool}")
             for selected_tool in selected_tools:
                 if selected_tool == "WEBSEARCH":
@@ -72,9 +73,26 @@ class Researcher(Role):
                         ReportSummary(self.name),
                     ]
                 else:
-                    self._add_actions[ToolUseSummary(tool_type=selected_tool)]
+                    self._add_actions[
+                        ToolSetting(tool_type=selected_tool),
+                        ToolUseSummary(tool_type=selected_tool),
+                    ]
+        elif isinstance(todo, ToolSetting):
+            problem, toolsetting = await todo.run(topic)
+            ret = Message(
+                content=problem,
+                instruct_content=toolsetting,
+                role=self.profile,
+                cause_by=type(todo),
+            )
         elif isinstance(todo, ToolUseSummary):
-            ToolSummary = await todo.run(topic, 5, system_text=research_system_text)
+            ToolSummary = await todo.run(
+                api_query=query,
+                problem=topic,
+                brief_search_num=20,
+                detail_search_num=5,
+                system_text=research_system_text,
+            )
             report = Report(
                 topic=topic,
                 content=ToolSummary,
@@ -166,11 +184,14 @@ class Researcher(Role):
                 cause_by=type(self._rc.todo),
             )
         self._rc.memory.add(ret)
-        report_dict = report.dict()
-        report_dict["workflow_id"] = 1  # for test
-        db_report = DBReport(**report_dict)
-        SESSION.add(db_report)
-        SESSION.commit()
+        try:
+            report_dict = report.dict()
+            report_dict["workflow_id"] = 1  # for test
+            db_report = DBReport(**report_dict)
+            SESSION.add(db_report)
+            SESSION.commit()
+        except:
+            logger.info("Not Report Made")
         return ret
 
     async def _react(self) -> Message:

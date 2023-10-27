@@ -83,12 +83,14 @@ class CostManager(metaclass=Singleton):
         self.total_prompt_tokens += prompt_tokens
         self.total_completion_tokens += completion_tokens
         cost = (
-            prompt_tokens * TOKEN_COSTS[model]["prompt"] + completion_tokens * TOKEN_COSTS[model]["completion"]
+            prompt_tokens * TOKEN_COSTS[model]["prompt"]
+            + completion_tokens * TOKEN_COSTS[model]["completion"]
         ) / 1000
         self.total_cost += cost
         logger.info(
             f"Total running cost: ${self.total_cost:.3f} | Max budget: ${CONFIG.max_budget:.3f} | "
-            f"Current cost: ${cost:.3f}, prompt_tokens: {prompt_tokens}, completion_tokens: {completion_tokens}"
+            f"Current cost: ${cost:.3f}, prompt_tokens: {prompt_tokens}, completion_tokens: {completion_tokens} | "
+            f"Used Model was ${model}"
         )
         CONFIG.total_cost = self.total_cost
 
@@ -123,7 +125,9 @@ def get_total_cost(self):
 
 def get_costs(self) -> Costs:
     """Get all costs"""
-    return Costs(self.total_prompt_tokens, self.total_completion_tokens, self.total_cost, self.total_budget)
+    return Costs(
+        self.total_prompt_tokens, self.total_completion_tokens, self.total_cost, self.total_budget
+    )
 
 
 def log_and_reraise(retry_state):
@@ -192,7 +196,9 @@ class OpenAIGPTAPI(BaseGPTAPI, RateLimiter):
         }
         if CONFIG.openai_api_type == "azure":
             if CONFIG.deployment_name and CONFIG.deployment_id:
-                raise ValueError("You can only use one of the `deployment_id` or `deployment_name` model")
+                raise ValueError(
+                    "You can only use one of the `deployment_id` or `deployment_name` model"
+                )
             elif not CONFIG.deployment_name and not CONFIG.deployment_id:
                 raise ValueError("You must specify `DEPLOYMENT_NAME` or `DEPLOYMENT_ID` parameter")
             kwargs_mode = (

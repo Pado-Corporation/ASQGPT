@@ -11,6 +11,7 @@ from metagpt.logs import logger
 from metagpt.tools.web_browser_engine import WebBrowserEngine, WebBrowserEngineType
 from metagpt.utils.common import OutputParser
 from metagpt.utils.text import generate_prompt_chunk
+from metagpt.actions.webresearch import get_research_system_text
 from metagpt.tools.current_researchtool import CURRENT_RESEARCHTOOL, get_tooldescription
 import aiohttp
 
@@ -31,17 +32,18 @@ Your response must be in JSON format, for example: ["keyword1",...].
 """
 
 TOOL_SUMMARY_PROMPT = """
-your role is summarize information based on problem user want to solve, and context of it.
+Utilize the text in the "Reference Information" section to respond to the question "{problem}".
 
-### Problem
-{problem}
-### Information
+### Reference Information
 {tool_result}
 
 ### Requirements
-- Decide this information is good for user's goal and context, or not.
-- Try to include important information like title.
-- Never include serpapi.com. Include google url.
+1. If the question cannot be directly answered using the text, but the text is related to the research topic, please provide \
+a comprehensive summary of the text.
+2. If the text is entirely unrelated to the research topic, please reply with a simple text "Not relevant."- Try to include important information like title.
+3. Include all relevant factual information, numbers, statistics, etc., if available.
+4. Even if data is not complete, you should make complete answer based on data.
+5. Only use data that exists
 """
 
 FINAL_SUMMARY_PROMPT = """
@@ -56,6 +58,8 @@ your role is summarize information based on problem user want to solve, and cont
 - Make report base on user goal and context.
 - Try to include url.
 - Give me your idea about the goal based on reference information.
+- Only use data that exists
+
 """
 
 
@@ -101,6 +105,7 @@ Your role is making appropriate query for problem I want to solve based on the a
 # Requirments
 - No explanation needed. Only give me result. 
 - You should wrap your result query in python code block
+
 
 # Format Example
 ```python```
@@ -155,6 +160,50 @@ class ToolSelect(Action):
         return selected_tools
 
 
+class ToolSetting(Action):
+    def __init__(
+        self,
+        tool_type: str,
+        serp_token=CONFIG.serpapi_api_key,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.desc = "Setup Tool Setting."
+        self.tool_type = tool_type
+        (
+            self.tool_description,
+            self.information_path,
+            self.detail_path,
+            self.final_path,
+        ) = get_tooldescription(tool_type)
+        if tool_type == "Walmart API":
+            self.detail_path = f"https://serpapi.com/search.json?engine=walmart_product_reviews&product_id={self.detail_path}"
+        if CONFIG.model_for_tool_setup:
+            self.llm.model = CONFIG.model_for_tool_setup
+
+    async def toolsetting(self, problem):
+        prompt_template = TOOL_SETTING_PROMPT.format(
+            problem=problem, description=self.tool_description
+        )
+        api_query = await self._aask(prompt_template)
+        return api_query
+
+    async def run(
+        self,
+        problem: str,
+    ):
+        self.problem = problem
+        api_query = await self.toolsetting(problem)
+        try:
+            api_query = OutputParser.parse_code(api_query)
+            api_query = api_query.strip().strip("'").strip('"')
+        except Exception as e:
+            logger.exception(f"fail to make proper serpapi query for {e}")
+        logger.log("DEVELOP", api_query)
+        return problem, api_query
+
+
 class ToolUseSummary(Action):
     def __init__(
         self,
@@ -178,15 +227,8 @@ class ToolUseSummary(Action):
             self.llm.model = CONFIG.model_for_researcher_summary
         self.token = serp_token
 
-    async def toolsetting(self, problem):
-        prompt_template = TOOL_SETTING_PROMPT.format(
-            problem=problem, description=self.tool_description
-        )
-        api_query = await self.llm.aask(prompt_template)
-        return api_query
-
-    async def execute_api(self, url, result_num=5):
-        query_url = url + f"&api_key={self.token}&num={result_num}"
+    async def execute_api(self, url):
+        query_url = url + f"&api_key={self.token}"
         logger.log("DEVELOP", query_url)
         async with aiohttp.ClientSession() as session:
             async with session.get(query_url) as response:
@@ -198,22 +240,38 @@ class ToolUseSummary(Action):
                     return None
 
     async def SummarizeToolResult(self, brief_info, detail_name=None, detail_info=None):
+        prompt_template = TOOL_SUMMARY_PROMPT.format(problem=self.problem, tool_result="{}")
         if detail_name is not None:
-            brief_prompt = TOOL_SUMMARY_PROMPT.format(
-                problem=self.problem, tool_result=str(brief_info)
+            brief_chunk_summaries = []
+            detail_chunk_summaries = []
+            for brief_prompt in generate_prompt_chunk(
+                str(brief_info), prompt_template, self.llm.model, system, CONFIG.max_tokens_rsp
+            ):
+                logger.debug(brief_prompt)
+                brief_summary = await self._aask(brief_prompt)
+                brief_chunk_summaries.append(brief_summary)
+            for detail_prompt in generate_prompt_chunk(
+                detail_name + str(detail_info),
+                prompt_template,
+                self.llm.model,
+                "",
+                CONFIG.max_tokens_rsp,
+            ):
+                logger.debug(detail_prompt)
+                detail_summary = await self._aask(detail_prompt)
+                detail_chunk_summaries.append(detail_summary)
+            tool_summary = str(
+                {"brief": brief_chunk_summaries, detail_name: detail_chunk_summaries}
             )
-            brief_summary = await self.llm.aask(brief_prompt)
-            detail_prompt = TOOL_SUMMARY_PROMPT.format(
-                problem=self.problem, tool_result=detail_name + str(detail_info)
-            )
-            detail_summary = await self.llm.aask(detail_prompt)
-            tool_summary = str({"brief": brief_summary, detail_name: detail_summary})
         else:
-            brief_prompt = TOOL_SUMMARY_PROMPT.format(
-                problem=self.problem, tool_result=str(brief_info)
-            )
-            brief_summary = await self.llm.aask(brief_prompt)
-            tool_summary = str({"brief": brief_summary})
+            brief_chunk_summaries = []
+            for brief_prompt in generate_prompt_chunk(
+                str(brief_info), prompt_template, self.llm.model, "", CONFIG.max_tokens_rsp
+            ):
+                logger.debug(brief_prompt)
+                brief_summary = await self._aask(brief_prompt)
+                brief_chunk_summaries.append(brief_summary)
+            tool_summary = str({"brief": brief_chunk_summaries})
         tool_summary = remove_serpapi_url(tool_summary)
         logger.info(tool_summary)
         return tool_summary
@@ -256,26 +314,33 @@ class ToolUseSummary(Action):
         logger.info(output)
         return output
 
-    async def run(self, problem: str, research_num: int, system_text: str):
-        self.problem = problem
-        api_query = await self.toolsetting(problem)
-        try:
-            api_query = OutputParser.parse_code(api_query)
-            api_query = api_query.strip().strip("'").strip('"')
-        except Exception as e:
-            logger.exception(f"fail to make proper serpapi query for {e}")
-        logger.log("DEVELOP", api_query)
-        rsp = await self.execute_api(api_query, research_num)
-
+    async def run(
+        self,
+        api_query: str,
+        problem: str,
+        brief_search_num: int,
+        detail_search_num: int,
+        system_text: str,
+    ):
+        rsp = await self.execute_api(api_query)
+        logger.info(rsp)
         if isinstance(self.information_path, str):
-            useful_infos = rsp[self.information_path][:research_num]
+            if "." in self.information_path:
+                path1, path2 = self.information_path.split(".")
+                useful_infos = rsp[path1][path2]
+            else:
+                useful_infos = rsp[self.information_path]
             if self.detail_path and self.final_path:
+                useful_infos = useful_infos[:detail_search_num]  # 얘네는 접속해서 데이터 긁어와서 제한 안하면 너무오래걸림.
+                # detail serpapi link 접속
                 tasks = [self._create_summary(info, self.execute_api) for info in useful_infos]
                 output = await self.log_and_gather_results(tasks, problem)
                 final_summary_prompt = FINAL_SUMMARY_PROMPT.format(
                     reference=output, problem=problem
                 )
             elif self.detail_path and not self.final_path:
+                useful_infos = useful_infos[:detail_search_num]
+                # detail link crawling
                 tasks = [
                     self._create_summary(
                         info, WebBrowserEngine(WebBrowserEngineType("playwright")).run
@@ -287,6 +352,8 @@ class ToolUseSummary(Action):
                     reference=output, problem=problem
                 )
             elif not self.detail_path and not self.final_path:
+                # 그냥 대표적 information 가져옴.
+                useful_infos = useful_infos[:brief_search_num]
                 final_summary_prompt = FINAL_SUMMARY_PROMPT.format(
                     reference=str(useful_infos), problem=problem
                 )
@@ -296,16 +363,29 @@ class ToolUseSummary(Action):
         if isinstance(self.information_path, list):
             # self.information_path가 list면 1_depth api call에 유용한 정보가 여러개있다는 것으로 해당 정보를 모두 stacking 하여 final report로 보냄.
             useful_infos = {}
+            tasks = []
+
             for information_path in self.information_path:
-                useful_infos_rsp = rsp[information_path]
-                useful_infos_rsp = useful_infos_rsp[:research_num]
-                useful_infos[information_path] = useful_infos_rsp
+                useful_info = rsp[information_path]
+                useful_info = useful_info[:brief_search_num]
+
+                # asyncio.gather를 사용하여 비동기 작업을 예약
+                task = asyncio.gather(self.SummarizeToolResult(useful_info))
+                tasks.append((information_path, task))
+
+            # 비동기 작업들을 동시에 실행
+            await asyncio.gather(*[task for _, task in tasks])
+
+            # 결과를 저장
+            for information_path, task in tasks:
+                useful_infos[information_path] = task.result()
+
             logger.info(useful_infos)
             final_summary_prompt = FINAL_SUMMARY_PROMPT.format(
                 reference=str(useful_infos), problem=problem
             )
 
-        summary_report = await self.llm.aask(final_summary_prompt, [system_text])
+        summary_report = await self._aask(final_summary_prompt, [system_text])
         return summary_report
 
 
@@ -318,9 +398,12 @@ if __name__ == "__main__":
 
     async def main(topic: str):
         print(topic)
-        selected_tools = await ToolSelect().run(topic)
+        system_prompt = get_research_system_text(topic, "en")
+        selected_tools = await ToolSelect().run(topic, system_prompt)
         for selected_tool in selected_tools:
-            tool_query = await ToolUseSummary(tool_type=selected_tool).run(topic, 5)
+            tool_query = await ToolUseSummary(tool_type=selected_tool).run(
+                topic, brief_search_num=20, detail_search_num=5, system_text=system_prompt
+            )
             logger.success(tool_query)
 
     fire.Fire(main)

@@ -15,6 +15,10 @@ NOTSURE_RESEARCHTOOL = [
         "tool": "Google Play Store",
         "WhenToUse": "When analyzing Android app metrics or searching for apps",
     },
+    {
+        "tool": "Google Trends by Region API",
+        "WhenToUse": "When investigating search trends by region",
+    },
 ]
 
 CURRENT_RESEARCHTOOL = [
@@ -39,12 +43,12 @@ CURRENT_RESEARCHTOOL = [
         "WhenToUse": "When investigating search trends or popularity over time",
     },
     {
-        "tool": "Google Trends by Region API",
-        "WhenToUse": "When investigating search trends by region",
+        "tool": "Google Finance STOCK API",
+        "WhenToUse": "Our Google Finance API allows you to scrape stock price data from the Google Finance page",
     },
     {
-        "tool": "Google Finance API",
-        "WhenToUse": "Our Google Finance API allows you to scrape results from the Google Finance page",
+        "tool": "Google Finance News and Financials API",
+        "WhenToUse": "Our Google Finance API allows you to scrape Financial news and Financial data like balance sheet data from the Google Finance page",
     },
     {
         "tool": "Walmart API",
@@ -166,15 +170,19 @@ GoogleTrendsbyRegionDescription = (
         {"name": "q", "type": "string", "necessary", "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Trends search. "},
         {"name": "engine", "type": "string", "necessary", "description": "Set parameter to google_trends to use the Google Trends by Region API engine."},
         {"name": "data_type", "type": "string", "necessary", "description": "Set parameter to GEO_MAP to use the Google Trends by Region API engine."}
-        {"name": "region", "type": "string:", "optional", "description": "Parameter is used for getting more specific results when using 'Compared breakdown by region' and 'Interest by region' data_type charts.", 
-        "options": {"COUNTRY" : "Country" , "REGION" : "Subregion", "DMA" , "Metro", "CITY": "City"]}
+        {"name": "region", "type": "singleselect", "Optional", "description": "Parameter is used for getting more specific results Available options:
+
+COUNTRY - Country
+REGION - Subregion
+DMA - Metro
+CITY - City"}
 
     ],
     "example": https://serpapi.com/search.json?engine=google_trends&q=coffee,milk,bread,pasta,steak&data_type=GEO_MAP&data_type=COUNTRY
 }
 
 """,
-    "interest_over_time",
+    "compared_breakdown_by_region",
     None,
     None,
 )
@@ -190,18 +198,31 @@ GoogleTrendsDescription = (
         {"name": "q", "type": "string", "necessary", "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Trends search. "},
         {"name": "engine", "type": "string", "necessary", "description": "Set parameter to google_trends to use the Google Trends API engine."},
         {"name": "data_type" , "description": "must set to TIMESERIES"}
+        {"name": "date", "necessary", "description" : "
+Parameter is used to define a date. Available options:
 
+now 1-H - Past hour
+now 4-H - Past 4 hours
+now 1-d - Past day
+now 7-d - Past 7 days
+today 1-m - Past 30 days
+today 3-m - Past 90 days
+today 12-m - Past 12 months
+all - 2004 - present You can also pass custom values:
+
+Dates from 2004 to present: yyyy-mm-dd yyyy-mm-dd (e.g. 2021-10-15 2022-05-25)
+Dates with hours within a week range: yyyy-mm-ddThh yyyy-mm-ddThh (e.g. 2022-05-19T10 2022-05-24T22). Hours will be calculated depending on the tz (time zone) parameter."}
     ],
     "example": https://serpapi.com/search.json?engine=google_trends&q=coffee,milk,bread,pasta,steak&data_type=TIMESERIES
 }
 
 """,
-    "compared_breakdown_by_region",
+    "interest_over_time.timeline_data",
     None,
     None,
 )
 
-GoogleFinanceDescription = (
+GoogleFinanceStockDescription = (
     """
 {
     "api_name": "Google Finance API",
@@ -209,22 +230,35 @@ GoogleFinanceDescription = (
     "endpoint": "https://serpapi.com/search",
     "request_method": "GET",
     "parameters": [
-        {"name": "q", "type": "string", "necessary", "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Trends search. "},
-        {"name": "engine", "type": "string", "necessary", "description": "Set parameter to google_finance to use the Google Trends API engine."},
-        {"name": "window", "type": "string", "optional", "description": "Parameter is used for setting time range for the graph. It can be set to:
-        1D - 1 Day(default)
-        5D - 5 Days
-        1M - 1 Month
-        6M - 6 Months
-        YTD - Year to Date
-        1Y - 1 Year
-        5Y - 5 Years"}
+        {"name": "q", "type": "string", "necessary", "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Finance search. If you want to search something, you should make it in searchquery:market form. example: NASDAQ:GOOG, GCW00:COMEX, NYSE: SHOP "},
+        {"name": "engine", "type": "string", "necessary", "description": "Set parameter to google_finance to use the Google Finance API engine."},
+        {"name": "window", "type": "string", "optional", "5D - 5 Days, 1M - 1 Month, 6M - 6 Months, YTD - Year to Date, 1Y - 1 Year, 5Y - 5 Years, MAX - Maximum"}
     ],
     "example": https://serpapi.com/search.json?engine=google_finance&q=GOOG:NASDAQ&window=5D
 }
 
 """,
-    ["graph", "financials"],
+    "graph",
+    None,
+    None,
+)
+
+GoogleFinanceFinancialDescription = (
+    """
+{
+    "api_name": "Google Finance API",
+    "api_description": "Our Google Finance API allows you to scrape SERP results from a Google Finance by search query as time series",
+    "endpoint": "https://serpapi.com/search",
+    "request_method": "GET",
+    "parameters": [
+        {"name": "q", "type": "string", "necessary", "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Finance search. If you want to search something, you should make it in searchquery:market form. example: NASDAQ:GOOG, GCW00:COMEX, NYSE: SHOP "},
+        {"name": "engine", "type": "string", "necessary", "description": "Set parameter to google_finance to use the Google Finance API engine."},
+    ],
+    "example": https://serpapi.com/search.json?engine=google_finance&q=GOOG:NASDAQ
+}
+
+""",
+    ["news_results", "financials"],
     None,
     None,
 )
@@ -299,10 +333,10 @@ GoogleFlightDescription = (
     "endpoint": "https://serpapi.com/search",
     "request_method": "GET",
     "parameters": [
-        {"name": "type", "options": "Available options: 1 - Round trip (default) 2 - One way"}
+        {"name": "type", "options": "1 - Round trip , 2 - One way"}
         {"name": "departure_id", "type": "string", "necessary", "description": " Parameter defines the departure airport code or city ID.An airport code is an uppercase 3-letter code. based on Google Flights or IATA For example, CDG is Paris Charles de Gaulle Airport and AUS is Austin-Bergstrom International Airport."},
         {"name": "engine", "type": "string", "necessary", "description": "Set parameter to google_flight to use the googleflight API engine."},
-        {"name": "arrival_id", "type": "string", "optional", "description": " Parameter defines the arrival airport code or city ID.An airport code is an uppercase 3-letter code. based on Google Flights or IATA For example, CDG is Paris Charles de Gaulle Airport and AUS is Austin-Bergstrom International Airport.Parameter is required if type parameter is set to: 1 (Round trip)"},
+        {"name": "arrival_id", "type": "string", "optional", "description": " Parameter defines the arrival airport code or city ID.An airport code is an uppercase 3-letter code. based on Google Flights or IATA For example, CDG is Paris Charles de Gaulle Airport and AUS is Austin-Bergstrom International Airport. if it is one way trip then do not input this parameter"},
         {"name": "outbound_date", "type": "string", "necessary", "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. 2023-10-24"},
         {"name": "return_date", "type": "string", "optional", "description": " Parameter defines the return date. The format is YYYY-MM-DD. e.g. 2023-10-30 Parameter is required if type parameter is set to: 1 (Round trip)"},
     ],
@@ -342,7 +376,8 @@ TOOL_DESCRIPTIONS = {
     "Google News API": GoogleNewsDescription,
     "Google Trends API": GoogleTrendsDescription,
     "Google Trends by Region API": GoogleTrendsbyRegionDescription,
-    "Google Finance API": GoogleFinanceDescription,
+    "Google Finance STOCK API": GoogleFinanceStockDescription,
+    "Google Finance News and Financials API": GoogleFinanceFinancialDescription,
     "Google Scholar API": GoogleScholarDescription,
     "Walmart API": WalmartDescription,
     "YouTube Search API": YoutubeSearchDescription,
