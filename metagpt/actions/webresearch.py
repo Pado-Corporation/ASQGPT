@@ -16,6 +16,9 @@ from metagpt.tools.web_browser_engine import WebBrowserEngine, WebBrowserEngineT
 from metagpt.utils.common import OutputParser
 from metagpt.utils.text import generate_prompt_chunk
 
+USER_GOALCONTEXT_SYSTEM = (
+    "You should be helpful to solve user's goal based on user context \n{goalcontext}"
+)
 
 LANG_PROMPT = "please act as {language} people, you consider their culture in your output. must respond in {language}"
 
@@ -378,7 +381,7 @@ class ReportSummary(Action):
         return await self._aask(prompt, [system_text])
 
 
-def get_research_system_text(topic: str, language: str):
+def get_research_system_text(goalncontext: str, topic: str, language: str):
     """Get the system text for conducting research.
 
     Args:
@@ -389,7 +392,11 @@ def get_research_system_text(topic: str, language: str):
         The system text for conducting research.
     """
     return " ".join(
-        (RESEARCH_TOPIC_SYSTEM.format(topic=topic), LANG_PROMPT.format(language=language))
+        (
+            USER_GOALCONTEXT_SYSTEM.format(goalcontext=goalncontext),
+            RESEARCH_TOPIC_SYSTEM.format(topic=topic),
+            LANG_PROMPT.format(language=language),
+        )
     )
 
 

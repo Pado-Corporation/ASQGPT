@@ -13,24 +13,24 @@ from metagpt.logs import logger
 DB_CONNECTION = CONFIG.db_addr
 vx = vecs.Client(DB_CONNECTION)
 
-pass_boss = """
-[GOAL]
-The user wants to deliver a structured and effective presentation on ILM powered multi-agent systems and AGI to students.
-[CONTEXT] 
-The user's presentation is about ILM powered multi-agent systems and their relation to AGI. The key points to be highlighted are the possibility of AGI, elements of AGI, and companies that are developing AGI. The user does not have a specific structure in mind for the presentation and there are no time constraints. The user needs help with the delivery of the presentation, specifically in making it more structured."""
+# pass_boss = """
+# [GOAL]
+# The user wants to deliver a structured and effective presentation on ILM powered multi-agent systems and AGI to students.
+# [CONTEXT]
+# The user's presentation is about ILM powered multi-agent systems and their relation to AGI. The key points to be highlighted are the possibility of AGI, elements of AGI, and companies that are developing AGI. The user does not have a specific structure in mind for the presentation and there are no time constraints. The user needs help with the delivery of the presentation, specifically in making it more structured."""
 
 
-async def main(launguage="en-us"):
+async def main(language="en-us"):
     init_db()
     openai.api_key = CONFIG.openai_api_key
-    boss_agent = Boss(language="kor")
+    boss_agent = Boss(language=language)
     goalncontext = boss_agent.run()
-    pm_agent = PlanningPM(language="kor")
+    pm_agent = PlanningPM(language=language)
     logger.info(f"{goalncontext}")
     assigned = await pm_agent.run(goalncontext)
     for assign in assigned.content:
         if assign["type"] == "Researcher":
-            role = Researcher(language="kor")
+            role = Researcher(goalncontext=goalncontext, language=language)
             report_summary = await role.run(assign["task"])
             logger.info(f"Report Summary: {report_summary}")
 

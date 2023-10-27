@@ -22,6 +22,7 @@ from metagpt.remoteDB import SESSION
 class Researcher(Role):
     def __init__(
         self,
+        goalncontext: str,
         name: str = "David",
         profile: str = "Researcher",
         goal: str = "Gather information and conduct research",
@@ -30,6 +31,7 @@ class Researcher(Role):
         **kwargs,
     ):
         self.name = name
+        self.goalncontext = goalncontext
         super().__init__(name, profile, goal, constraints, **kwargs)
         self._init_actions([ToolSelect(name)])
         self.language = language
@@ -59,7 +61,7 @@ class Researcher(Role):
             topic = msg.content
             query = msg.instruct_content
         ret = None
-        research_system_text = get_research_system_text(topic, self.language)
+        research_system_text = get_research_system_text(self.goalncontext, topic, self.language)
         if isinstance(todo, ToolSelect):
             selected_tools = await todo.run(topic, system_text=research_system_text)
             logger.info(f"Toolselected: {selected_tools}")

@@ -396,9 +396,9 @@ def remove_serpapi_url(tool_summary):
 if __name__ == "__main__":
     import fire
 
-    async def main(topic: str):
+    async def main(goalncontext: str, topic: str):
         print(topic)
-        system_prompt = get_research_system_text(topic, "en")
+        system_prompt = get_research_system_text(goalncontext, topic, "en")
         selected_tools = await ToolSelect().run(topic, system_prompt)
         for selected_tool in selected_tools:
             tool_query = await ToolUseSummary(tool_type=selected_tool).run(
