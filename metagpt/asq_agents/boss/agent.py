@@ -1,26 +1,20 @@
-import os
 import openai
 import sys
-from metagpt.boss_agent.functions import read_file, check_completion
 from metagpt.config import CONFIG
+import utils.read
 
-
-class Boss:
-    def __init__(self, language="en-us"):
-        # Reads the boss' prompt.
-        instruction = read_file("boss_prompt.md")
-        # Sets the model that will be powering the boss.
+class Agent:
+    """
+    Investigates the user's true intention and 
+    """
+    def __init__(self, language="Korean"):
+        instruction = utils.read.instruction("boss")
         if CONFIG.model_for_boss:
             self.model_type = CONFIG.model_for_boss
         else:
             self.model_type = "gpt-4"
-        language_instruction = f"Respond in {language}" + instruction
-        # Initializes the first context to be delivered to the language model.
+        language_instruction = f"Respond using the following language: {language}\n" + instruction
         self.messages = [{"role": "system", "content": language_instruction}]
-
-    def greetings(self):
-        welcome_text = read_file("welcome.txt")
-        print(welcome_text)
 
     def listen(self):
         """
@@ -57,7 +51,7 @@ class Boss:
         print(f"ASQ: {msg}")
         self.messages.append(response_message)
 
-        return check_completion("[GOAL]", msg), msg
+        return "[GOAL]" in msg, msg
 
     def conversation(self):
         """
