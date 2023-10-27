@@ -1,9 +1,10 @@
 import openai
 import utils.read
 
-class Summarizer:
-    def __init__(self, model_type="gpt-3.5-turbo"):
-        instruction = utils.read.instruction("summarizer")
+class Agent:
+    def __init__(self, language: str= "Korean", model_type="gpt-4"):
+        base_instruction = utils.read.instruction("summarizer")
+        instruction = f"Respond using this language: {language}\n{base_instruction}"
         self.model_type = model_type
         self.messages = [
             {

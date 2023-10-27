@@ -1,5 +1,5 @@
-Summarize the Markdown text into a single paragraph, following these rules:
+Summarize the given report into a summary, following these rules:
 
-- Output is Markdown text
-- Paragraph must not exceed 300 words
-- Show references with hyperlinks respectively
+- Summary is Markdown format
+- Summary is under 500 words
+- Do not lose important details

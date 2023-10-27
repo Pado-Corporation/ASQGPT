@@ -3,8 +3,11 @@ import sys
 from metagpt.config import CONFIG
 import utils.read
 
-class Boss:
-    def __init__(self, language="en-us"):
+class Agent:
+    """
+    Investigates the user's true intention and 
+    """
+    def __init__(self, language="Korean"):
         instruction = utils.read.instruction("boss")
         if CONFIG.model_for_boss:
             self.model_type = CONFIG.model_for_boss
