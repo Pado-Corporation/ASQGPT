@@ -104,15 +104,15 @@ above. The report must meet the following requirements:
 """
 
 SUMMARY_REPORT_PROMPT = """
-Summarize the Markdown text into a single paragraph,
+Summarize the given report into a summary, following these rules:
+
+- Summary is Markdown format
+- Summary is under 500 words
+- Do not lose important details
+- Show references with hyperlinks respectively APA form.
 
 ---- Report ------------
 {report}
----- Requirments -------
-- Output is Markdown text
-- Paragraph must not exceed 300 words
-- Show references with hyperlinks respectively APA form.
-- You must include Reference link you used.
 """
 
 
